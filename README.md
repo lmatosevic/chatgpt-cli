@@ -18,9 +18,9 @@ pip install chatgpt-cli-tool
 Or you can install it directly form this project source:
 
 ```sh
-python3 build.py
+python build.py
 
-pip3 install dist/chatgpt-cli-tool-{version}.tar.gz
+pip install dist/chatgpt-cli-tool-{version}.tar.gz
 ```
 
 ## Configuration

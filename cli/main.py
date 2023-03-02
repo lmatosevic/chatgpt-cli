@@ -11,7 +11,7 @@ default_model = 'gpt-3.5-turbo'
 
 
 def main():
-    load_dotenv()
+    load_dotenv(os.getcwd() + '/.env')
 
     api_key = None
     org_id = None
@@ -45,8 +45,8 @@ def main():
     openai.api_key = api_key
     openai.organization = org_id
 
-    print(f'Welcome to the ChatGPT command line interface\n')
-    print(f'Please enter your question (type "exit" to stop chatting)\n')
+    print('Welcome to the ChatGPT command line interface\n')
+    print('Please enter your question (type "exit" to stop chatting)\n')
 
     end = False
     chat_history = []
