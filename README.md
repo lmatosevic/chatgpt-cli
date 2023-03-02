@@ -4,7 +4,7 @@
 
 ## Requirements
 
-* Python >= 3.6
+* Python >= 3.7.1
 * OpenAI account and valid API key
 
 ## Installation
@@ -41,7 +41,7 @@ To see other configurable options for ChatGPT check out **.env.example** file.
 If you installed the tool using pip, then simply start the cli using command:
 
 ```sh
-chatgpt-cli your_api_key
+chatgpt-cli [api_key] [org_id] [model]
 ```
 
 If you are using source code, then first install the Python requirements:
