@@ -77,7 +77,7 @@ def main():
 
             print('\nAI: ', end='')
             for char in text:
-                print(char, end='')
+                print(char, end='', flush=True)
                 time.sleep(0.01)
             print('\n')
         except openai.error.APIError as e:
