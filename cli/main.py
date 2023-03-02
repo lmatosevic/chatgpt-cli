@@ -54,6 +54,9 @@ def main():
         try:
             question = input('You: ')
 
+            if question is None or question.strip() == '':
+                continue
+
             if question in ['exit', 'quit', 'close', 'end']:
                 break
 
