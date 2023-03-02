@@ -9,7 +9,7 @@ Command line interface tool for interacting with ChatGPT using your favorite ter
 """
 
 setup(name="chatgpt-cli-tool",
-      version="1.0.0",
+      version="1.0.1",
       author="luka",
       author_email="lukamatosevic5@gmail.com",
       url='https://github.com/lmatosevic/chatgpt-cli',
