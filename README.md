@@ -7,6 +7,21 @@
 * Python >= 3.6
 * OpenAI account and valid API key
 
+## Installation
+Tool can be installed using python3 `pip` command:
+
+```sh
+pip install chatgpt-cli-tool
+```
+
+Or you can install it directly form this project source:
+
+```sh
+python3 build.py
+
+pip3 install dist/chatgpt-cli-tool-{version}.tar.gz
+```
+
 ## Configuration
 
 In order to use ChatGPT cli you will first need to register and create an API key on

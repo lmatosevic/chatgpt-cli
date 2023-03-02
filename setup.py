@@ -8,7 +8,7 @@ ChatGPT-cli
 Command line interface tool for interacting with ChatGPT using your favorite terminal
 """
 
-setup(name="chatgpt-cli",
+setup(name="chatgpt-cli-tool",
       version="1.0.0",
       author="luka",
       author_email="lukamatosevic5@gmail.com",

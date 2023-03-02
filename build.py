@@ -3,4 +3,4 @@ import shutil
 
 
 os.system('python setup.py sdist bdist_wheel')
-shutil.rmtree('chatgpt_cli.egg-info')
+shutil.rmtree('chatgpt_cli_tool.egg-info')
