@@ -8,7 +8,7 @@ ChatGPT-cli
 Command line interface tool for interacting with ChatGPT using your favorite terminal
 """
 
-version = "1.0.6"
+version = "1.0.7"
 
 setup(name="chatgpt-cli-tool",
       version=version,
@@ -25,5 +25,4 @@ setup(name="chatgpt-cli-tool",
           ]
       },
       keywords=['chatgpt', 'openapi', 'cli', 'chat'],
-      description="ChatGPT command line interface",
-      long_description=desc)
+      description="ChatGPT command line interface")
