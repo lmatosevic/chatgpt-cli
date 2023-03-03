@@ -1,14 +1,9 @@
 from setuptools import setup
 from setuptools import find_packages
 
-desc = """\
-ChatGPT-cli
-==============
+desc = "Command line interface tool for interacting with ChatGPT using your favorite terminal"
 
-Command line interface tool for interacting with ChatGPT using your favorite terminal
-"""
-
-version = "1.0.7"
+version = "1.0.8"
 
 setup(name="chatgpt-cli-tool",
       version=version,
@@ -25,4 +20,4 @@ setup(name="chatgpt-cli-tool",
           ]
       },
       keywords=['chatgpt', 'openapi', 'cli', 'chat'],
-      description="ChatGPT command line interface")
+      description=desc)
