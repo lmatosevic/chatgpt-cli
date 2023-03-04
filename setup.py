@@ -3,7 +3,8 @@ from setuptools import find_packages
 
 desc = "Command line interface tool for interacting with ChatGPT using terminal"
 
-version = "1.1.0"
+verstrline = open('./cli/__init__.py', "rt").readline()
+version = verstrline.split('=')[-1].strip().replace('\'', '')
 
 setup(name="chatgpt-cli-tool",
       version=version,
@@ -13,10 +14,11 @@ setup(name="chatgpt-cli-tool",
       download_url=f'https://github.com/lmatosevic/chatgpt-cli/archive/refs/tags/{version}.tar.gz',
       packages=find_packages(),
       install_requires=["openai", "python-dotenv"],
-      python_requires='>=3.7.1',
+      python_requires='>=3.8.0',
       entry_points={
           'console_scripts': [
-              'chatgpt-cli = cli:main.main'
+              'chatgpt-cli = cli:main.main',
+              'gpt-ai = cli:command.run'
           ]
       },
       keywords=['chatgpt', 'openapi', 'cli', 'chat'],

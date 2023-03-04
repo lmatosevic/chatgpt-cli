@@ -4,7 +4,7 @@
 
 ## Requirements
 
-* Python >= 3.7.1
+* Python >= 3.8.0
 * OpenAI account and valid API key
 
 ## Installation
@@ -15,7 +15,7 @@ Tool can be installed using python3 `pip` command:
 pip install chatgpt-cli-tool
 ```
 
-Or you can install it directly form this project source:
+Or you can install it directly form this project after building it:
 
 ```sh
 python build.py
@@ -33,31 +33,43 @@ Then you can configure the tool with your API key using any of the following opt
 1. Create an **~/.chatgpt-cli/.env** file with variable **OPENAI_API_KEY**
 2. Create an **.env** file in the working directory with variable **OPENAI_API_KEY**
 3. Set it through environment variable **OPENAI_API_KEY**
-4. Pass it as the first argument when executing this script (e.g. `python main.py my_api_key`)
+4. Pass it as the first argument when executing this tool (e.g. `chatgpt-cli my_api_key`)
 
 To see other configurable options for ChatGPT check out **.env.example** file.
 
 ## Running the CLI
 
-If you installed the tool using pip, then simply start the cli using command:
+If you installed the tool using pip, then simply start the cli using any of the following commands:
 
 ```sh
-chatgpt-cli [api_key] [org_id] [model]
-```
+# interactive chat command template
+chatgpt-cli [api_key]
 
-If you are using source code, then first install the Python requirements:
+# example with api key
+chatgpt-cli my_api_key
+
+# example without api key
+chatgpt-cli
+```
 
 ```sh
-pip install -r requirements.txt
+# single gpt request command template
+gpt-ai [api_key] [query]
+
+# single command example with api key and query argument
+gpt-ai my_api_key "What is ChatGPT?"
+
+# single command example with query argument
+gpt-ai "What is ChatGPT?"
+
+# single command example with query from stdin
+cat question.txt | gpt-ai
+
+# single command example with both query as argument and string input
+cat long-story.txt | gpt-ai "sumarize this text in 5 bullet points"
 ```
 
-Then, sse the following command to run this script:
-
-```sh
-python main.py [api_key] [org_id] [model]
-```
-
-All arguments are optional and if provided will override those defined using environment variables or **.env** file.
+API key argument is optional, but if provided it will override API key defined using environment variables.
 
 ## License
 
