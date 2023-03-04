@@ -7,13 +7,16 @@ from cli.core import ensure_api_key, chatgpt_response, valid_input, default_syst
 
 def run():
     content = None
-    f = open(0, 'r', encoding='utf-8')
-    old_file_position = f.tell()
-    f.seek(0, os.SEEK_END)
-    size = f.tell()
-    f.seek(old_file_position, os.SEEK_SET)
-    if size > 0:
-        content = f.read()
+    try:
+        f = open(0, 'r', encoding='utf-8')
+        old_file_position = f.tell()
+        f.seek(0, os.SEEK_END)
+        size = f.tell()
+        f.seek(old_file_position, os.SEEK_SET)
+        if size > 0:
+            content = f.read()
+    except Exception:
+        pass
 
     key_in_args = False
     if len(sys.argv) > 2:
