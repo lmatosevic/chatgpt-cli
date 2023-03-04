@@ -1,49 +1,14 @@
-import os
-import sys
 import time
 
 import openai
-from dotenv import load_dotenv
 
-default_api_key = None
-default_org_id = None
-default_model = 'gpt-3.5-turbo'
+from cli.utils import find_api_key
+
+model = 'gpt-3.5-turbo'
 
 
 def main():
-    load_dotenv(os.getcwd() + '/.env')
-
-    api_key = None
-    org_id = None
-
-    if len(sys.argv) > 1:
-        api_key = str(sys.argv[1])
-
-    if len(sys.argv) > 2:
-        org_id = str(sys.argv[2])
-
-    if len(sys.argv) > 3:
-        model = str(sys.argv[3])
-    else:
-        model = os.getenv('OPENAI_MODEL', default_model)
-
-    if api_key is None:
-        api_key = os.getenv('OPENAI_API_KEY', default_api_key)
-        org_id = os.getenv('OPENAI_ORG_ID', default_org_id)
-
-    if org_id is None:
-        org_id = os.getenv('OPENAI_ORG_ID', None)
-
-    if api_key is None:
-        print(
-            'API key not configured. You can configure API key in any of the following ways:\n'
-            '1. Set it through environment variable OPENAI_API_KEY\n'
-            '2. Create an .env file in the same directory as the script with variable OPENAI_API_KEY\n'
-            '3. Pass it as the first argument when executing this script')
-        sys.exit(1)
-
-    openai.api_key = api_key
-    openai.organization = org_id
+    openai.api_key = find_api_key(prompt=True)
 
     print('Welcome to the ChatGPT command line interface\n')
     print('Please enter your question (type "exit" to stop chatting)\n')
@@ -57,12 +22,12 @@ def main():
             if question is None or question.strip() == '':
                 continue
 
-            if question in ['exit', 'quit', 'close', 'end']:
+            if question.strip().lower() in ['exit', 'quit', 'close', 'end']:
                 break
 
             message = {'role': 'user', 'content': question}
             messages = [
-                {'role': 'system', 'content': 'You are very direct and straight to the point assistant.'},
+                {'role': 'system', 'content': 'You are a very direct and straight-to-the-point assistant.'},
                 *chat_history,
                 message
             ]

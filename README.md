@@ -1,6 +1,6 @@
 # ChatGPT - Command Line Interface
 
-> CLI tool for interacting with ChatGPT using your favorite terminal
+> CLI tool for interacting with ChatGPT using terminal
 
 ## Requirements
 
@@ -30,9 +30,10 @@ the [official OpenAI website](https://platform.openai.com/account/api-keys).
 
 Then you can configure the tool with your API key using any of the following options:
 
-1. Set it through environment variable **OPENAI_API_KEY**
+1. Create an **~/.chatgpt-cli/.env** file with variable **OPENAI_API_KEY**
 2. Create an **.env** file in the working directory with variable **OPENAI_API_KEY**
-3. Pass it as the first argument when executing this script (e.g. `python main.py my_api_key`)
+3. Set it through environment variable **OPENAI_API_KEY**
+4. Pass it as the first argument when executing this script (e.g. `python main.py my_api_key`)
 
 To see other configurable options for ChatGPT check out **.env.example** file.
 

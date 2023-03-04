@@ -1,9 +1,9 @@
 from setuptools import setup
 from setuptools import find_packages
 
-desc = "Command line interface tool for interacting with ChatGPT using your favorite terminal"
+desc = "Command line interface tool for interacting with ChatGPT using terminal"
 
-version = "1.0.8"
+version = "1.1.0"
 
 setup(name="chatgpt-cli-tool",
       version=version,
