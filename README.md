@@ -106,7 +106,7 @@ cat description.txt | gpt-img > ./image.png
 gpt-img < idea.txt
 ```
 
-API key argument is optional of all commands, but if provided it will override API key defined using environment
+API key argument is optional for all commands, but if provided it will override API key defined using environment
 variables.
 
 ## License
