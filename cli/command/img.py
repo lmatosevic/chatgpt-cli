@@ -1,4 +1,5 @@
 import sys
+import os
 from urllib.request import urlopen
 
 import openai
@@ -63,7 +64,9 @@ def run():
     img = urlopen(response).read()
 
     if img_out is None:
-        sys.stdout.buffer.write(img)
+        stdout = os.fdopen(sys.stdout.fileno(), "wb", closefd=False)
+        stdout.write(img)
+        stdout.flush()
     else:
         image_file = open(img_out, 'wb')
         image_file.write(img)
