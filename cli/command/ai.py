@@ -1,29 +1,16 @@
-import os
 import sys
 
 import openai
 
-from cli.core import ensure_api_key, chatgpt_response, valid_input, default_system_desc
+from cli.core import ensure_api_key, read_stdin, valid_api_key, valid_input, default_system_desc, chatgpt_response
 
 
 def run():
-    content = None
-    try:
-        f = open(0, 'r', encoding='utf-8')
-        if f.seekable():
-            f.seek(0, os.SEEK_CUR)
-            old_file_position = f.tell()
-            f.seek(0, os.SEEK_END)
-            size = f.tell()
-            f.seek(old_file_position, os.SEEK_SET)
-            if size > 0:
-                content = f.read()
-        else:
-            if not sys.stdin.isatty():
-                content = sys.stdin.read()
-    except Exception as e:
-        print(f'Error: {e}')
-        pass
+    """
+    gpt-ai [api_key] [query]
+    """
+
+    content = read_stdin()
 
     key_in_args = False
     if len(sys.argv) > 2:
@@ -31,6 +18,9 @@ def run():
         key_in_args = True
     elif len(sys.argv) > 1:
         query = str(sys.argv[1])
+        if valid_api_key(query):
+            key_in_args = True
+            query = None
     else:
         query = None
 

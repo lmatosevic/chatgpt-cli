@@ -1,4 +1,4 @@
-# ChatGPT - Command Line Interface
+# ChatGPT - Command-Line Interface
 
 > CLI tool for interacting with ChatGPT using terminal
 
@@ -41,35 +41,58 @@ To see other configurable options for ChatGPT check out **.env.example** file.
 
 If you installed the tool using pip, then simply start the cli using any of the following commands:
 
-```sh
-# interactive chat command template
-chatgpt-cli [api_key]
+### chatgpt-cli [api_key]
 
-# example with api key
+```sh
+# with api key
 chatgpt-cli my_api_key
 
-# example without api key
+# without api key
 chatgpt-cli
 ```
 
-```sh
-# single gpt request command template
-gpt-ai [api_key] [query]
+### gpt-ai [api_key] [query]
 
-# single command example with api key and query argument
+```sh
+# with api key and query argument
 gpt-ai my_api_key "What is ChatGPT?"
 
-# single command example with query argument
+# with query argument
 gpt-ai "What is ChatGPT?"
 
-# single command example with query from stdin
+# with api key and piped input
+cat file.txt | gpt-ai my_api_key
+
+# with query from stdin
 cat question.txt | gpt-ai
 
-# single command example with both query as argument and piped input
+# with both query as argument and piped input
 cat long-story.txt | gpt-ai "sumarize this text in 5 bullet points"
 
-# single command example with both query as argument and input directly from file
+# with both query as argument and input directly from file
 gpt-ai "explain this code" < main.py
+```
+
+### gpt-img [api_key] [prompt] [img_out]
+
+```sh
+# with api key, prompt and output image path
+gpt-img my_api_key "Robot walking a dog" ./my-images/image.png
+
+# without api key
+gpt-img "Robot walking a dog" ./my-images/image.png
+
+# without output image path, the binary image data will be outputed to stdout
+gpt-img "Robot walking a dog" > image.png
+
+# with both piped input and argument prompts
+cat description.txt | gpt-img "with cartoon graphics" ./image.png
+
+# with only piped input and output image file
+cat description.txt | gpt-img ./image.png
+
+# with only input directly from file, binary image data will be outputed to stdout
+gpt-img < idea.txt
 ```
 
 API key argument is optional, but if provided it will override API key defined using environment variables.

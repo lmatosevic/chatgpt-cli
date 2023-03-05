@@ -1,7 +1,7 @@
 from setuptools import setup
 from setuptools import find_packages
 
-desc = "Command line interface tool for interacting with ChatGPT using terminal"
+desc = "Command-line interface tool for interacting with ChatGPT using terminal"
 
 verstrline = open('./cli/__init__.py', "rt").readline()
 version = verstrline.split('=')[-1].strip().replace('\'', '')
@@ -18,8 +18,9 @@ setup(name="chatgpt-cli-tool",
       entry_points={
           'console_scripts': [
               'chatgpt-cli = cli:main.main',
-              'gpt-ai = cli:ai.run'
+              'gpt-ai = cli:command.ai.run',
+              'gpt-img = cli:command.img.run'
           ]
       },
-      keywords=['chatgpt', 'openapi', 'cli', 'chat'],
+      keywords=['chatgpt', 'openai', 'dall-e', 'cli', 'chat'],
       description=desc)

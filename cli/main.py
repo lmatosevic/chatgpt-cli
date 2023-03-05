@@ -6,9 +6,13 @@ from cli.core import ensure_api_key, icase_contains, chatgpt_response, default_s
 
 
 def main():
+    """
+    chatgpt-cli [api_key]
+    """
+
     openai.api_key = ensure_api_key(prompt=True)
 
-    print('Welcome to the ChatGPT command line interface\n')
+    print('Welcome to the ChatGPT command-line interface\n')
     print('Please enter your question (type "exit" to stop chatting)\n')
 
     end = False

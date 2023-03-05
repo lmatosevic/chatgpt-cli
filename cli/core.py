@@ -59,6 +59,27 @@ def ensure_api_key(default: str = None, prompt: bool = False, use_args_key: bool
     return api_key if valid_input(api_key) else default
 
 
+def read_stdin() -> Union[str, None]:
+    content = None
+    try:
+        f = open(0, 'r', encoding='utf-8')
+        if f.seekable():
+            f.seek(0, os.SEEK_CUR)
+            old_file_position = f.tell()
+            f.seek(0, os.SEEK_END)
+            size = f.tell()
+            f.seek(old_file_position, os.SEEK_SET)
+            if size > 0:
+                content = f.read()
+        else:
+            if not sys.stdin.isatty():
+                content = sys.stdin.read()
+    except Exception as e:
+        print(f'Error on stdin input: {e}')
+        pass
+    return content
+
+
 def chatgpt_response(messages: List[MessageType]) -> Union[str, None]:
     if messages is None or len(messages) == 0:
         print('No messages provided')
@@ -84,9 +105,37 @@ def chatgpt_response(messages: List[MessageType]) -> Union[str, None]:
         sys.exit(5)
 
 
+def image_url_response(prompt: str) -> Union[str, None]:
+    if prompt is None:
+        print('Prompt not provided')
+        return None
+    try:
+        response = openai.Image.create(prompt=prompt, n=1, size="512x512")
+        return response.data[0].url
+    except openai.error.APIError as e:
+        print(f'OpenAI API returned an API Error: {e}')
+        return None
+    except openai.error.APIConnectionError as e:
+        print(f'Failed to connect to OpenAI API: {e}')
+        return None
+    except openai.error.AuthenticationError as e:
+        print(f'Invalid ApiKey: {e}')
+        sys.exit(4)
+    except openai.error.RateLimitError as e:
+        print(f'OpenAI API request exceeded rate limit: {e}')
+        return None
+    except openai.error.InvalidRequestError as e:
+        print(f'Invalid request: {e}')
+        sys.exit(5)
+
+
 def valid_input(value: Optional[str]) -> bool:
     return value is not None and value.strip() != ''
 
 
 def icase_contains(value: Optional[str], items: List[str]) -> bool:
     return valid_input(value) and value.strip().lower() in items
+
+
+def valid_api_key(value: str) -> bool:
+    return value.strip().startswith('sk-') and ' ' not in value.strip() and len(value.strip()) >= 48
