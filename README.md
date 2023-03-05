@@ -43,6 +43,8 @@ If you installed the tool using pip, then simply start the cli using any of the 
 
 ### chatgpt-cli [api_key]
 
+This command starts interactive ChatGPT where you can chat with AI in form of a dialog.
+
 ```sh
 # with api key
 chatgpt-cli my_api_key
@@ -52,6 +54,8 @@ chatgpt-cli
 ```
 
 ### gpt-ai [api_key] [query]
+
+This comand sends single chat completion prompt for given query or content, and prints the result on stdout.
 
 ```sh
 # with api key and query argument
@@ -74,6 +78,10 @@ gpt-ai "explain this code" < main.py
 ```
 
 ### gpt-img [api_key] [prompt] [img_out]
+
+This comand generates image for given prompt or content, and stores the image in provided output path or if not
+specified, prints the binary result on stdout. Some terminals like PowerShell might malform the binary content when
+outputing to file.
 
 ```sh
 # with api key, prompt and output image path
@@ -98,7 +106,8 @@ cat description.txt | gpt-img > ./image.png
 gpt-img < idea.txt
 ```
 
-API key argument is optional, but if provided it will override API key defined using environment variables.
+API key argument is optional of all commands, but if provided it will override API key defined using environment
+variables.
 
 ## License
 
