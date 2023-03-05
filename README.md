@@ -35,7 +35,14 @@ Then you can configure the tool with your API key using any of the following opt
 3. Set it through environment variable **OPENAI_API_KEY**
 4. Pass it as the first argument when executing this tool (e.g. `chatgpt-cli my_api_key`)
 
-To see other configurable options for ChatGPT check out **.env.example** file.
+All configurable environment variables for ChatGPT can be found in [.env.example](.env.example) file:
+
+| Variable name   | Description                                                  | Default value                                              |
+|-----------------|--------------------------------------------------------------|------------------------------------------------------------|
+| OPENAI_API_KEY  | OpenAI API key used to send request                          | -                                                          |
+| GPT_MODEL       | GPT model used for chat completion                           | gpt-3.5-turbo                                              |
+| GPT_SYSTEM_DESC | The description for the system on how to best tailor answers | You are a very direct and straight-to-the-point assistant. |
+| GPT_IMAGE_SIZE  | The generated image size (256x256, 512x512 or 1024x1024)     | 512x512                                                    |
 
 ## Running the CLI
 
