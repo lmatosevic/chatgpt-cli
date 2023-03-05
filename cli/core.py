@@ -150,7 +150,7 @@ def valid_api_key(value: str) -> bool:
     return value.strip().startswith('sk-') and ' ' not in value.strip() and len(value.strip()) >= 48
 
 
-def get_env(key: str, default: str) -> str:
+def get_env(key: str, default: Optional[str]) -> str:
     value = os.getenv(key, default)
     if not valid_input(value):
         value = default
