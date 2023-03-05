@@ -2,7 +2,7 @@ import sys
 
 import openai
 
-from cli.core import ensure_api_key, read_stdin, valid_api_key, valid_input, default_system_desc, chatgpt_response
+from cli.core import ensure_api_key, read_stdin, valid_api_key, valid_input, chatgpt_response
 
 
 def run():
@@ -31,15 +31,13 @@ def run():
               'Usage example: cat long-story.txt | gpt-ai "sumarize this text in 5 bullet points"')
         sys.exit(1)
 
-    messages = [
-        {'role': 'system', 'content': default_system_desc}
-    ]
+    messages = []
 
     if valid_input(content):
-        messages.append({'role': 'user', 'content': content})
+        messages.append({'role': 'user', 'content': str(content)})
 
     if valid_input(query):
-        messages.append({'role': 'user', 'content': query})
+        messages.append({'role': 'user', 'content': str(query)})
 
     response = chatgpt_response(messages)
     if response is None:

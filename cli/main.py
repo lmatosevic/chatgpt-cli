@@ -2,7 +2,7 @@ import time
 
 import openai
 
-from cli.core import ensure_api_key, icase_contains, chatgpt_response, default_system_desc
+from cli.core import ensure_api_key, icase_contains, chatgpt_response
 
 
 def main():
@@ -29,7 +29,6 @@ def main():
 
             message = {'role': 'user', 'content': question}
             messages = [
-                {'role': 'system', 'content': default_system_desc},
                 *chat_history,
                 message
             ]

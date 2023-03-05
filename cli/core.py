@@ -10,17 +10,18 @@ from cli import __version__
 home_env_file = os.path.expanduser('~') + '/.chatgpt-cli/.env'
 env_file = os.getcwd() + '/.env'
 
+load_dotenv(home_env_file)
+load_dotenv(env_file)
+
 default_model = 'gpt-3.5-turbo'
 default_system_desc = 'You are a very direct and straight-to-the-point assistant.'
+default_image_size = '512x512'
 
 MessageType = TypedDict('MessageType', {'role': str, 'content': str})
 
 
 def ensure_api_key(default: str = None, prompt: bool = False, use_args_key: bool = True) -> str:
-    load_dotenv(home_env_file)
-    load_dotenv(env_file)
-
-    api_key = os.getenv('OPENAI_API_KEY', default)
+    api_key = get_env('OPENAI_API_KEY', default)
 
     if len(sys.argv) > 1:
         value = sys.argv[1]
@@ -85,8 +86,13 @@ def chatgpt_response(messages: List[MessageType]) -> Union[str, None]:
         print('No messages provided')
         return None
 
+    model = get_env('GPT_MODEL', default_model)
+    system_desc = get_env('GPT_SYSTEM_DESC', default_system_desc)
+
+    messages.insert(0, {'role': 'system', 'content': system_desc})
+
     try:
-        response = openai.ChatCompletion.create(model=default_model, messages=messages)
+        response = openai.ChatCompletion.create(model=model, messages=messages)
         return response.choices[0].message.content.strip('\n')
     except openai.error.APIError as e:
         print(f'OpenAI API returned an API Error: {e}')
@@ -109,8 +115,11 @@ def image_url_response(prompt: str) -> Union[str, None]:
     if prompt is None:
         print('Prompt not provided')
         return None
+
+    image_size = get_env('GPT_IMAGE_SIZE', default_image_size)
+
     try:
-        response = openai.Image.create(prompt=prompt, n=1, size="512x512")
+        response = openai.Image.create(prompt=prompt, n=1, size=image_size)
         return response.data[0].url
     except openai.error.APIError as e:
         print(f'OpenAI API returned an API Error: {e}')
@@ -139,3 +148,10 @@ def icase_contains(value: Optional[str], items: List[str]) -> bool:
 
 def valid_api_key(value: str) -> bool:
     return value.strip().startswith('sk-') and ' ' not in value.strip() and len(value.strip()) >= 48
+
+
+def get_env(key: str, default: str) -> str:
+    value = os.getenv(key, default)
+    if not valid_input(value):
+        value = default
+    return value
