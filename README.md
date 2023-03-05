@@ -91,6 +91,9 @@ cat description.txt | gpt-img "with cartoon graphics" ./image.png
 # with only piped input and output image file
 cat description.txt | gpt-img ./image.png
 
+# with only piped input and output image directed to file
+cat description.txt | gpt-img > ./image.png
+
 # with only input directly from file, binary image data will be outputed to stdout
 gpt-img < idea.txt
 ```
