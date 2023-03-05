@@ -65,8 +65,11 @@ gpt-ai "What is ChatGPT?"
 # single command example with query from stdin
 cat question.txt | gpt-ai
 
-# single command example with both query as argument and string input
+# single command example with both query as argument and piped input
 cat long-story.txt | gpt-ai "sumarize this text in 5 bullet points"
+
+# single command example with both query as argument and input directly from file
+gpt-ai "explain this code" < main.py
 ```
 
 API key argument is optional, but if provided it will override API key defined using environment variables.
