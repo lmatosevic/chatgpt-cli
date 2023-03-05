@@ -1,6 +1,7 @@
-import openai
-import sys
 import os
+import sys
+
+import openai
 
 from cli.core import ensure_api_key, chatgpt_response, valid_input, default_system_desc
 
@@ -9,13 +10,19 @@ def run():
     content = None
     try:
         f = open(0, 'r', encoding='utf-8')
-        old_file_position = f.tell()
-        f.seek(0, os.SEEK_END)
-        size = f.tell()
-        f.seek(old_file_position, os.SEEK_SET)
-        if size > 0:
-            content = f.read()
-    except Exception:
+        if f.seekable():
+            f.seek(0, os.SEEK_CUR)
+            old_file_position = f.tell()
+            f.seek(0, os.SEEK_END)
+            size = f.tell()
+            f.seek(old_file_position, os.SEEK_SET)
+            if size > 0:
+                content = f.read()
+        else:
+            if not sys.stdin.isatty():
+                content = sys.stdin.read()
+    except Exception as e:
+        print(f'Error: {e}')
         pass
 
     key_in_args = False

@@ -18,7 +18,7 @@ setup(name="chatgpt-cli-tool",
       entry_points={
           'console_scripts': [
               'chatgpt-cli = cli:main.main',
-              'gpt-ai = cli:command.run'
+              'gpt-ai = cli:ai.run'
           ]
       },
       keywords=['chatgpt', 'openapi', 'cli', 'chat'],
