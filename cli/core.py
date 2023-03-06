@@ -89,7 +89,8 @@ def chatgpt_response(messages: List[MessageType]) -> Union[str, None]:
     model = get_env('GPT_MODEL', default_model)
     system_desc = get_env('GPT_SYSTEM_DESC', default_system_desc)
 
-    messages.insert(0, {'role': 'system', 'content': system_desc})
+    if system_desc.lower() != 'none':
+        messages.insert(0, {'role': 'system', 'content': system_desc})
 
     try:
         response = openai.ChatCompletion.create(model=model, messages=messages)
