@@ -39,8 +39,8 @@ def main():
 
             chat_history.append(message)
             chat_history.append({'role': 'assistant', 'content': response})
-            if len(chat_history) > 4:
-                chat_history.pop(0)
+            if len(chat_history) >= 8:
+                chat_history = chat_history[2:]
 
             print('\nAI: ', end='')
             for char in response:
