@@ -43,6 +43,7 @@ All configurable environment variables for ChatGPT can be found in [.env.example
 | GPT_MODEL       | GPT model used for chat completion                                                 | gpt-3.5-turbo                                              |
 | GPT_SYSTEM_DESC | The description for the system on how to best tailor answers (disable with "None") | You are a very direct and straight-to-the-point assistant. |
 | GPT_IMAGE_SIZE  | The generated image size (256x256, 512x512 or 1024x1024)                           | 512x512                                                    |
+| HISTORY_SIZE    | Number of last messages to keep in hostory as a context for the next question      | 3                                                          |
 
 ## Running the CLI
 
@@ -116,6 +117,13 @@ gpt-img < idea.txt
 API key argument is optional for all commands, but if provided it will override API key defined using environment
 variables.
 
+## Recommendations
+
+### ChatGPT-Slackbot
+
+If you are a regular Slack user, check out my other project which provides seamless ChatGPT and Slack
+integration: https://github.com/lmatosevic/chatgpt-slackbot
+
 ## License
 
-ChatGPT-cli is [MIT licensed](LICENSE).
+ChatGPT-Cli is [MIT licensed](LICENSE).

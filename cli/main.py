@@ -2,13 +2,15 @@ import time
 
 import openai
 
-from cli.core import ensure_api_key, icase_contains, chatgpt_response
+from cli.core import ensure_api_key, icase_contains, chatgpt_response, get_env
 
 
 def main():
     """
     chatgpt-cli [api_key]
     """
+
+    history_size = int(get_env('HISTORY_SIZE', '3'))
 
     openai.api_key = ensure_api_key(prompt=True)
 
@@ -39,7 +41,7 @@ def main():
 
             chat_history.append(message)
             chat_history.append({'role': 'assistant', 'content': response})
-            if len(chat_history) >= 8:
+            if len(chat_history) >= (history_size + 1) * 2:
                 chat_history = chat_history[2:]
 
             print('\nAI: ', end='')
