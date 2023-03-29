@@ -33,7 +33,7 @@ Then you can configure the tool with your API key using any of the following opt
 1. Create an **~/.chatgpt-cli/.env** file with variable **OPENAI_API_KEY**
 2. Create an **.env** file in the working directory with variable **OPENAI_API_KEY**
 3. Set it through environment variable **OPENAI_API_KEY**
-4. Pass it as the first argument when executing this tool (e.g. `chatgpt-cli my_api_key`)
+4. Pass it as the first argument when executing this tool (e.g. `chatgpt-cli my_api_key [out_file]`)
 
 All configurable environment variables for ChatGPT can be found in [.env.example](.env.example) file:
 
@@ -53,17 +53,26 @@ All configurable environment variables for ChatGPT can be found in [.env.example
 
 If you installed the tool using pip, then simply start the cli using any of the following commands:
 
-### chatgpt-cli [api_key]
+### chatgpt-cli [api_key] [file_out]
 
 This command starts interactive ChatGPT where you can chat with AI in form of a dialog.
 
 ```sh
-# with api key
+# with api key and conversation output file path
+chatgpt-cli my_api_key ./path/to/chat.txt
+
+# with api key only
 chatgpt-cli my_api_key
 
-# without api key
+# with conversation output file
+chatgpt-cli chat.txt
+
+# without any arguments, api key is used from env variable and conversation is not saved to file
 chatgpt-cli
 ```
+
+If file does not exist it will be created together with all parent directories. Otherwise, if the file already exists
+the current chat conversation will be appended to the end of file.
 
 ### gpt-ai [api_key] [query]
 
