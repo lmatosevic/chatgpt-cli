@@ -1,6 +1,6 @@
 import os
 import sys
-from typing import List, TypedDict, Union, Optional
+from typing import List, TypedDict, Union, Optional, Tuple
 
 import openai
 from dotenv import load_dotenv
@@ -37,7 +37,7 @@ def ensure_api_key(default: str = None, prompt: bool = False, use_args_key: bool
             '1. Create an ~/.chatgpt-cli/.env file with variable OPENAI_API_KEY\n'
             '2. Create an .env file in the working directory with variable OPENAI_API_KEY\n'
             '3. Set it through environment variable OPENAI_API_KEY\n'
-            '4. Pass it as the first argument when executing this script (e.g. chatgpt-cli your_api_key)\n')
+            '4. Pass it as the first argument when executing this script (e.g. chatgpt-cli your_api_key [out_file])\n')
 
         if prompt is False:
             sys.exit(1)
@@ -58,6 +58,21 @@ def ensure_api_key(default: str = None, prompt: bool = False, use_args_key: bool
                 print(f'API key saved in {home_env_file}\n')
 
     return api_key if valid_input(api_key) else default
+
+
+def check_args_for_key() -> Tuple[bool, str]:
+    key_in_args = False
+    if len(sys.argv) > 2:
+        value = str(sys.argv[2])
+        key_in_args = True
+    elif len(sys.argv) > 1:
+        value = str(sys.argv[1])
+        if valid_api_key(value):
+            key_in_args = True
+            value = None
+    else:
+        value = None
+    return key_in_args, value
 
 
 def read_stdin() -> Union[str, None]:

@@ -2,7 +2,7 @@ import sys
 
 import openai
 
-from cli.core import ensure_api_key, read_stdin, valid_api_key, valid_input, chatgpt_response
+from cli.core import ensure_api_key, read_stdin, check_args_for_key, valid_input, chatgpt_response
 
 
 def run():
@@ -12,17 +12,7 @@ def run():
 
     content = read_stdin()
 
-    key_in_args = False
-    if len(sys.argv) > 2:
-        query = str(sys.argv[2])
-        key_in_args = True
-    elif len(sys.argv) > 1:
-        query = str(sys.argv[1])
-        if valid_api_key(query):
-            key_in_args = True
-            query = None
-    else:
-        query = None
+    key_in_args, query = check_args_for_key()
 
     openai.api_key = ensure_api_key(prompt=True, use_args_key=key_in_args)
 
