@@ -44,7 +44,7 @@ def main():
     file = None
     if file_out:
         file_dir = os.path.dirname(file_out)
-        if not os.path.exists(file_dir):
+        if file_dir != '' and not os.path.exists(file_dir):
             os.makedirs(file_dir, exist_ok=True)
         file = open(file_out, 'a')
         now = datetime.now()
