@@ -37,13 +37,17 @@ Then you can configure the tool with your API key using any of the following opt
 
 All configurable environment variables for ChatGPT can be found in [.env.example](.env.example) file:
 
-| Variable name   | Description                                                                        | Default value                                              |
-|-----------------|------------------------------------------------------------------------------------|------------------------------------------------------------|
-| OPENAI_API_KEY  | OpenAI API key used to send request                                                | -                                                          |
-| GPT_MODEL       | GPT model used for chat completion                                                 | gpt-3.5-turbo                                              |
-| GPT_SYSTEM_DESC | The description for the system on how to best tailor answers (disable with "None") | You are a very direct and straight-to-the-point assistant. |
-| GPT_IMAGE_SIZE  | The generated image size (256x256, 512x512 or 1024x1024)                           | 512x512                                                    |
-| HISTORY_SIZE    | Number of last messages to keep in history as a context for the next question      | 3                                                          |
+| Variable name   | Description                                                                                         | Default value                                              |
+|-----------------|-----------------------------------------------------------------------------------------------------|------------------------------------------------------------|
+| OPENAI_API_KEY  | OpenAI API key used to send request                                                                 | -                                                          |
+| GPT_MODEL       | GPT model used for chat completion                                                                  | gpt-3.5-turbo                                              |
+| GPT_SYSTEM_DESC | The description for the system on how to best tailor answers (disable with "None")                  | You are a very direct and straight-to-the-point assistant. |
+| GPT_IMAGE_SIZE  | The generated image size (256x256, 512x512 or 1024x1024)                                            | 512x512                                                    |
+| HISTORY_SIZE    | Number of last messages to keep in history as a context for the next question                       | 3                                                          |
+| CHAT_TEXT_WIDTH | Maximum number of characters to display per line in interactive chat mode (0 - as much as possible) | 0                                                          |
+| CHAT_COLORED    | Enable this to use colors in interactive chat mode                                                  | true                                                       |
+| CHAT_COLOR_YOU  | The color used for your inputs                                                                      | green                                                      |
+| CHAT_COLOR_AI   | The colore of AI responses                                                                          | white                                                      |
 
 ## Running the CLI
 
