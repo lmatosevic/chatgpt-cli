@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 from datetime import datetime
 
@@ -6,6 +7,11 @@ import openai
 from colorama import Fore
 from colorama import Style
 from colorama import init as colorama_init
+from prompt_toolkit import prompt
+from prompt_toolkit.output.win32 import NoConsoleScreenBufferError
+from prompt_toolkit.styles import Style as PromptStyle
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from cli.core import ensure_api_key, icase_contains, chatgpt_response, check_args_for_key, get_env
 
@@ -30,12 +36,12 @@ def main():
     if colored:
         colorama_init(autoreset=True)
 
-        color_you = getattr(Fore, color_you) if color_you in Fore.__dict__.keys() and color_you != 'WHITE' else ''
-        color_ai = getattr(Fore, color_ai) if color_ai in Fore.__dict__.keys() and color_ai != 'WHITE' else ''
+        color_you_ansi = getattr(Fore, color_you) if color_you in Fore.__dict__.keys() and color_you != 'WHITE' else ''
+        color_ai_ansi = getattr(Fore, color_ai) if color_ai in Fore.__dict__.keys() and color_ai != 'WHITE' else ''
         color_end = Style.RESET_ALL
     else:
-        color_you = ''
-        color_ai = ''
+        color_you_ansi = ''
+        color_ai_ansi = ''
         color_end = ''
 
     print(f'Welcome to the ChatGPT command-line interface\n')
@@ -56,14 +62,18 @@ def main():
     chat_history = []
     while end is False:
         try:
-            question = input(f'{color_you}You: ')
+            try:
+                style = PromptStyle.from_dict(
+                    {'': f'ansi{color_you.lower()}' if color_you_ansi != '' else ''})
+                question = prompt('You: ', style=style)
+            except NoConsoleScreenBufferError:
+                question = input(f'{color_you_ansi}You: ')
+                if colored:
+                    print('', end=color_end)
 
             if file:
                 file.write(f'\nYou: {question}\n')
                 file.flush()
-
-            if colored:
-                print('', end=color_end)
 
             if question is None or question.strip() == '':
                 continue
@@ -90,11 +100,11 @@ def main():
             if len(chat_history) >= (history_size + 1) * 2:
                 chat_history = chat_history[2:]
 
-            print(f'\n{color_ai}AI: ', end=color_end)
+            print(f'\n{color_ai_ansi}AI: ', end=color_end)
             count = 0
             for char in response:
                 count += 1
-                print(f'{color_ai}{char}', end=color_end, flush=True)
+                print(f'{color_ai_ansi}{char}', end=color_end, flush=True)
                 if 0 < text_width <= count:
                     print('')
                     count = 0
@@ -102,7 +112,7 @@ def main():
             print('\n')
         except KeyboardInterrupt:
             break
-    print(f'\n{color_ai}AI: Goodbye', end=color_end)
+    print(f'\n{color_ai_ansi}AI: Goodbye', end=color_end)
     if file:
         file.write(f'\nAI: Goodbye\n')
         file.close()

@@ -1,5 +1,9 @@
 # ChatGPT - Command-Line Interface
 
+![pypi](https://img.shields.io/pypi/v/chatgpt-cli-tool)
+![License](https://img.shields.io/pypi/l/chatgpt-cli-tool)
+![npm](https://img.shields.io/badge/build-passing-brightgreen)
+
 > CLI tool for interacting with ChatGPT using terminal
 
 ## Requirements
@@ -41,6 +45,7 @@ All configurable environment variables for ChatGPT can be found in [.env.example
 |-----------------|-----------------------------------------------------------------------------------------------------|------------------------------------------------------------|
 | OPENAI_API_KEY  | OpenAI API key used to send request                                                                 | -                                                          |
 | GPT_MODEL       | GPT model used for chat completion                                                                  | gpt-3.5-turbo                                              |
+| GPT_TEMPERATURE | GPT temperature value (between 0 and 2), lower values provde more focused and deterministic output  | 1                                                          |
 | GPT_SYSTEM_DESC | The description for the system on how to best tailor answers (disable with "None")                  | You are a very direct and straight-to-the-point assistant. |
 | GPT_IMAGE_SIZE  | The generated image size (256x256, 512x512 or 1024x1024)                                            | 512x512                                                    |
 | HISTORY_SIZE    | Number of last messages to keep in history as a context for the next question                       | 3                                                          |
@@ -48,6 +53,8 @@ All configurable environment variables for ChatGPT can be found in [.env.example
 | CHAT_COLORED    | Enable this to use colors in interactive chat mode                                                  | true                                                       |
 | CHAT_COLOR_YOU  | The color used for your inputs                                                                      | green                                                      |
 | CHAT_COLOR_AI   | The colore of AI responses                                                                          | white                                                      |
+
+_Supported ANSI colors are: black, red, green, yellow, blue, magenta, cyan, and white_
 
 ## Running the CLI
 
