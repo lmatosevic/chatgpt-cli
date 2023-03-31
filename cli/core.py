@@ -14,6 +14,7 @@ load_dotenv(home_env_file)
 load_dotenv(env_file)
 
 default_model = 'gpt-3.5-turbo'
+default_temperature = '1'
 default_system_desc = 'You are a very direct and straight-to-the-point assistant.'
 default_image_size = '512x512'
 
@@ -33,7 +34,9 @@ def ensure_api_key(default: str = None, prompt: bool = False, use_args_key: bool
 
     if not valid_input(api_key):
         print(
-            'API key not configured. You can configure API key in any of the following ways:\n'
+            'OpenAI API key is not configured. If you don\'t have OpenAI API key yet, you can create it here: '
+            'https://platform.openai.com/account/api-keys\n\n'
+            'The API key can be configured in any of the following ways:\n'
             '1. Create an ~/.chatgpt-cli/.env file with variable OPENAI_API_KEY\n'
             '2. Create an .env file in the working directory with variable OPENAI_API_KEY\n'
             '3. Set it through environment variable OPENAI_API_KEY\n'
@@ -102,13 +105,14 @@ def chatgpt_response(messages: List[MessageType]) -> Union[str, None]:
         return None
 
     model = get_env('GPT_MODEL', default_model)
+    temperature = float(get_env('GPT_TEMPERATURE', default_temperature))
     system_desc = get_env('GPT_SYSTEM_DESC', default_system_desc)
 
     if system_desc.lower() != 'none':
         messages.insert(0, {'role': 'system', 'content': system_desc})
 
     try:
-        response = openai.ChatCompletion.create(model=model, messages=messages)
+        response = openai.ChatCompletion.create(model=model, temperature=temperature, messages=messages)
         return response.choices[0].message.content.strip('\n')
     except openai.error.APIError as e:
         print(f'OpenAI API returned an API Error: {e}')
