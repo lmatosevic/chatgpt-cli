@@ -8,7 +8,6 @@ from colorama import Fore
 from colorama import Style
 from colorama import init as colorama_init
 from prompt_toolkit import prompt
-from prompt_toolkit.output.win32 import NoConsoleScreenBufferError
 from prompt_toolkit.styles import Style as PromptStyle
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
@@ -66,7 +65,7 @@ def main():
                 style = PromptStyle.from_dict(
                     {'': f'ansi{color_you.lower()}' if color_you_ansi != '' else ''})
                 question = prompt('You: ', style=style)
-            except NoConsoleScreenBufferError:
+            except Exception:
                 question = input(f'{color_you_ansi}You: ')
                 if colored:
                     print('', end=color_end)
