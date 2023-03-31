@@ -1,7 +1,7 @@
 # ChatGPT - Command-Line Interface
 
 ![pypi](https://img.shields.io/pypi/v/chatgpt-cli-tool)
-![License](https://img.shields.io/pypi/l/chatgpt-cli-tool)
+![License](https://img.shields.io/pypi/l/chat)
 ![npm](https://img.shields.io/badge/build-passing-brightgreen)
 
 > CLI tool for interacting with ChatGPT using terminal
