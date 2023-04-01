@@ -12,6 +12,7 @@ from prompt_toolkit.styles import Style as PromptStyle
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
+from cli import __version__
 from cli.core import ensure_api_key, icase_contains, chatgpt_response, check_args_for_key, get_env
 
 
@@ -43,8 +44,8 @@ def main():
         color_ai_ansi = ''
         color_end = ''
 
-    print(f'Welcome to the ChatGPT command-line interface\n')
-    print('Please enter your question (type "exit" to stop chatting)\n')
+    print(f'Welcome to the ChatGPT command-line interface v{__version__}\n')
+    print('Please enter your question (type "exit" to stop chatting, type "reset" to clear chat history)\n')
 
     file = None
     if file_out:
@@ -79,6 +80,14 @@ def main():
 
             if icase_contains(question, ['exit', 'quit', 'close', 'end']):
                 break
+
+            if icase_contains(question, ['reset']):
+                chat_history = []
+                print(f'\n{color_ai_ansi}AI: Let\'s start a new conversation.\n\n', end=color_end)
+                if file:
+                    file.write(f'\nAI: Let\'s start a new conversation.\n\n')
+                    file.flush()
+                continue
 
             message = {'role': 'user', 'content': question}
             messages = [
