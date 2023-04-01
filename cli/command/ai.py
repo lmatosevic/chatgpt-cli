@@ -1,6 +1,9 @@
+import os
 import sys
 
 import openai
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from cli.core import ensure_api_key, read_stdin, check_args_for_key, valid_input, chatgpt_response
 

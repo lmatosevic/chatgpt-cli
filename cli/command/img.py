@@ -1,8 +1,10 @@
-import sys
 import os
+import sys
 from urllib.request import urlopen
 
 import openai
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from cli.core import ensure_api_key, read_stdin, valid_api_key, valid_input, image_url_response
 

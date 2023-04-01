@@ -45,7 +45,7 @@ All configurable environment variables for ChatGPT can be found in [.env.example
 |-----------------|-----------------------------------------------------------------------------------------------------|------------------------------------------------------------|
 | OPENAI_API_KEY  | OpenAI API key used to send request                                                                 | -                                                          |
 | GPT_MODEL       | GPT model used for chat completion                                                                  | gpt-3.5-turbo                                              |
-| GPT_TEMPERATURE | GPT temperature value (between 0 and 2), lower values provde more focused and deterministic output  | 1                                                          |
+| GPT_TEMPERATURE | GPT temperature value (between 0 and 2), lower values provide more focused and deterministic output | 1                                                          |
 | GPT_SYSTEM_DESC | The description for the system on how to best tailor answers (disable with "None")                  | You are a very direct and straight-to-the-point assistant. |
 | GPT_IMAGE_SIZE  | The generated image size (256x256, 512x512 or 1024x1024)                                            | 512x512                                                    |
 | HISTORY_SIZE    | Number of last messages to keep in history as a context for the next question                       | 3                                                          |
