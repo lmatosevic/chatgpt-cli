@@ -1,6 +1,6 @@
 import os
 import sys
-from typing import List, TypedDict, Union, Optional, Tuple
+from typing import List, TypedDict, Union, Optional, Tuple, Iterable
 
 import openai
 from dotenv import load_dotenv
@@ -15,6 +15,7 @@ load_dotenv(env_file)
 
 default_model = 'gpt-3.5-turbo'
 default_temperature = '1'
+default_stream_response = 'true'
 default_system_desc = 'You are a very direct and straight-to-the-point assistant.'
 default_image_size = '512x512'
 
@@ -99,21 +100,31 @@ def read_stdin() -> Union[str, None]:
     return content
 
 
-def chatgpt_response(messages: List[MessageType]) -> Union[str, None]:
+def chatgpt_response(messages: List[MessageType]) -> Union[str, Iterable[str], None]:
     if messages is None or len(messages) == 0:
         print('No messages provided')
         return None
 
     model = get_env('GPT_MODEL', default_model)
     temperature = float(get_env('GPT_TEMPERATURE', default_temperature))
+    stream = icase_contains(get_env('GPT_STREAM_RESPONSE', default_stream_response), ['true', 'yes', 'on'])
     system_desc = get_env('GPT_SYSTEM_DESC', default_system_desc)
 
     if system_desc.lower() != 'none':
         messages.insert(0, {'role': 'system', 'content': system_desc})
 
     try:
-        response = openai.ChatCompletion.create(model=model, temperature=temperature, messages=messages)
-        return response.choices[0].message.content.strip('\n')
+        response = openai.ChatCompletion.create(model=model, temperature=temperature, messages=messages, stream=stream)
+        if not stream:
+            return response.choices[0].message.content.strip('\n')
+
+        def stream_response() -> Iterable[str]:
+            for line in response:
+                chunk = line['choices'][0].get('delta', {}).get('content', '')
+                if chunk:
+                    yield chunk
+
+        return stream_response()
     except openai.error.APIError as e:
         print(f'OpenAI API returned an API Error: {e}')
         return None

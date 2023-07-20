@@ -36,7 +36,13 @@ def run():
     if response is None:
         sys.exit(2)
 
-    print(response)
+    if isinstance(response, str):
+        print(response)
+    else:
+        stream_content = ''
+        for token in response:
+            stream_content += token
+        print(stream_content)
 
 
 if __name__ == '__main__':
