@@ -61,6 +61,8 @@ def main():
     end = False
     chat_history = []
     while end is False:
+        stream_content = ''
+        stream_in_progress = False
         try:
             try:
                 style = PromptStyle.from_dict(
@@ -99,27 +101,48 @@ def main():
             if response is None:
                 break
 
-            if file:
+            if file and isinstance(response, str):
                 file.write(f'\nAI: {response}\n')
                 file.flush()
 
             chat_history.append(message)
-            chat_history.append({'role': 'assistant', 'content': response})
-            if len(chat_history) >= (history_size + 1) * 2:
-                chat_history = chat_history[2:]
+
+            if isinstance(response, str):
+                chat_history.append({'role': 'assistant', 'content': response})
+            else:
+                stream_in_progress = True
 
             print(f'\n{color_ai_ansi}AI: ', end=color_end)
             count = 0
-            for char in response:
-                count += 1
-                print(f'{color_ai_ansi}{char}', end=color_end, flush=True)
-                if 0 < text_width <= count:
-                    print('')
-                    count = 0
-                time.sleep(0.01)
+            for token in response:
+                for char in token:
+                    count += 1
+                    stream_content += char
+                    print(f'{color_ai_ansi}{char}', end=color_end, flush=True)
+                    if 0 < text_width <= count:
+                        print('')
+                        count = 0
+                    time.sleep(0.01)
             print('\n')
+            stream_in_progress = False
+
+            if not isinstance(response, str):
+                chat_history.append({'role': 'assistant', 'content': stream_content})
+                if file:
+                    file.write(f'\nAI: {stream_content}\n')
+                    file.flush()
+
+            if len(chat_history) >= (history_size + 1) * 2:
+                chat_history = chat_history[2:]
         except KeyboardInterrupt:
-            break
+            if stream_in_progress:
+                chat_history.append({'role': 'assistant', 'content': stream_content})
+                if file:
+                    file.write(f'\nAI: {stream_content}\n')
+                    file.flush()
+                print('\n')
+            else:
+                break
     print(f'\n{color_ai_ansi}AI: Goodbye', end=color_end)
     if file:
         file.write(f'\nAI: Goodbye\n')
