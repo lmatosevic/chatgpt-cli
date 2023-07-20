@@ -1,6 +1,7 @@
 import os
 import sys
 import time
+import re
 from datetime import datetime
 
 import openai
@@ -48,18 +49,72 @@ def main():
     print('Please enter your question (type "exit" to stop chatting, type "reset" to clear chat history)\n')
 
     file = None
+    file_messages = []
     if file_out:
         file_dir = os.path.dirname(file_out)
         if file_dir != '' and not os.path.exists(file_dir):
             os.makedirs(file_dir, exist_ok=True)
-        file = open(file_out, 'a')
+
+        option = None
+        if os.path.exists(file_out):
+            print(
+                f'Output file "{file_out}" already exists, please select one of the options:\n'
+                '1. Continue conversation\n'
+                '2. Keep previous content and start new conversation\n'
+                '3. Delete previous content and start new conversation\n')
+            while not option:
+                answer = input('Selected option: ')
+                try:
+                    if not answer:
+                        print('1')
+                    option = int(answer if answer != '' else '1')
+                    if option not in [1, 2, 3]:
+                        option = None
+                        raise ValueError('Invalid option')
+                    else:
+                        print('\n', end='')
+                except ValueError:
+                    print('Invalid option selected. Available options: 1, 2, or 3\n')
+
+        file = open(file_out, 'w' if option == 3 else 'a')
         now = datetime.now()
         prefix = '\n\n' if os.path.getsize(file_out) > 0 else ''
         file.write(f'{prefix}[{now.isoformat()}]\n')
         file.flush()
 
+        if option == 1:
+            date_pattern = re.compile("^\[\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}]$")
+            with open(file_out, 'r') as fp:
+                role = None
+                content = ''
+                for line in fp:
+                    line_text = line if not date_pattern.match(line) else ''
+                    new_role = None
+                    if line.startswith('AI: '):
+                        new_role = 'assistant'
+                        line_text = line.replace('AI: ', '', 1)
+                    if line.startswith('You: '):
+                        new_role = 'user'
+                        line_text = line.replace('You: ', '', 1)
+                    if role is None:
+                        role = new_role
+
+                    if role is not None:
+                        content += line_text
+
+                    if role != new_role and role is not None:
+                        if not icase_contains(content.replace('\n', ''),
+                                              ['exit', 'quit', 'close', 'end', 'reset', 'goodbye']) and \
+                                content.replace('\n', '') != 'Let\'s start a new conversation.':
+                            file_messages.append({'role': role, 'content': content})
+                        role = new_role
+                        content = ''
+
+                    if icase_contains(line_text.replace('\n', ''), ['reset']):
+                        file_messages.clear()
+
     end = False
-    chat_history = []
+    chat_history = [*file_messages[-2 * (history_size + 1):]]
     while end is False:
         stream_content = ''
         stream_in_progress = False
