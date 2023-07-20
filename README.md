@@ -80,7 +80,11 @@ chatgpt-cli
 ```
 
 If file does not exist it will be created together with all parent directories. Otherwise, if the file already exists
-the current chat conversation will be appended to the end of file.
+the user is prompted with 3 options on how to handle the existing file content:
+
+1. Continue conversation
+2. Keep previous content and start new conversation
+3. Delete previous content and start new conversation
 
 ### gpt-ai [api_key] [query]
 
