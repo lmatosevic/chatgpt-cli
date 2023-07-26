@@ -46,7 +46,7 @@ def main():
         color_end = ''
 
     print(f'Welcome to the ChatGPT command-line interface v{__version__}\n')
-    print('Please enter your question (type "exit" to stop chatting, type "reset" to clear chat history)\n')
+    print('Please enter your question (type "/quit" to stop chatting, type "/reset" to clear chat history)\n')
 
     file = None
     file_messages = []
@@ -104,13 +104,13 @@ def main():
 
                     if role != new_role and role is not None:
                         if not icase_contains(content.replace('\n', ''),
-                                              ['exit', 'quit', 'close', 'end', 'reset', 'goodbye']) and \
+                                              ['/quit', '/q', '/reset', '/r', 'goodbye']) and \
                                 content.replace('\n', '') != 'Let\'s start a new conversation.':
                             file_messages.append({'role': role, 'content': content})
                         role = new_role
                         content = ''
 
-                    if icase_contains(line_text.replace('\n', ''), ['reset']):
+                    if icase_contains(line_text.replace('\n', ''), ['/reset', '/r']):
                         file_messages.clear()
 
     end = False
@@ -135,10 +135,10 @@ def main():
             if question is None or question.strip() == '':
                 continue
 
-            if icase_contains(question, ['exit', 'quit', 'close', 'end']):
+            if icase_contains(question, ['/quit', '/q']):
                 break
 
-            if icase_contains(question, ['reset']):
+            if icase_contains(question, ['/reset', '/r']):
                 chat_history = []
                 print(f'\n{color_ai_ansi}AI: Let\'s start a new conversation.\n\n', end=color_end)
                 if file:
