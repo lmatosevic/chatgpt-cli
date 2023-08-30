@@ -1,6 +1,7 @@
 .idea
 
 .venv
+venv
 
 dist
 build
