@@ -142,6 +142,16 @@ gpt-img < idea.txt
 API key argument is optional for all commands, but if provided it will override API key defined using environment
 variables.
 
+## Examples
+
+### Interactive mode
+
+![interactive chat](https://github.com/lmatosevic/chatgpt-cli/blob/main/resources/chatgpt-cli-interactive.png?raw=true)
+
+### Single query mode
+
+![single command](https://github.com/lmatosevic/chatgpt-cli/blob/main/resources/chatgpt-cli-gpt-ai.png?raw=true)
+
 ## Recommendations
 
 ### ChatGPT-Slackbot
