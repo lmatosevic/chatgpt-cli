@@ -17,7 +17,8 @@ default_model = 'gpt-3.5-turbo'
 default_temperature = '1'
 default_stream_response = 'true'
 default_system_desc = 'You are a very direct and straight-to-the-point assistant.'
-default_image_size = '512x512'
+default_image_model = 'dall-e-2'
+default_image_size = '1024x1024'
 
 MessageType = TypedDict('MessageType', {'role': str, 'content': str})
 
@@ -147,10 +148,11 @@ def image_url_response(prompt: str) -> Union[str, None]:
         print('Prompt not provided')
         return None
 
+    image_model = get_env('GPT_IMAGE_MODEL', default_image_model)
     image_size = get_env('GPT_IMAGE_SIZE', default_image_size)
 
     try:
-        response = openai.Image.create(prompt=prompt, n=1, size=image_size)
+        response = openai.Image.create(model=image_model, prompt=prompt, n=1, size=image_size)
         return response.data[0].url
     except openai.error.APIError as e:
         print(f'OpenAI API returned an API Error: {e}')

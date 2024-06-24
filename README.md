@@ -48,12 +48,16 @@ All configurable environment variables for ChatGPT can be found in [.env.example
 | GPT_TEMPERATURE     | GPT temperature value (between 0 and 2), lower values provide more focused and deterministic output | 1                                                          |
 | GPT_STREAM_RESPONSE | Enable OpenAI client to use Server Sent Events for streaming tokens from the API                    | true                                                       |
 | GPT_SYSTEM_DESC     | The description for the system on how to best tailor answers (disable with "None")                  | You are a very direct and straight-to-the-point assistant. |
-| GPT_IMAGE_SIZE      | The generated image size (256x256, 512x512 or 1024x1024)                                            | 512x512                                                    |
+| GPT_IMAGE_MODEL     | GPT model used for generating images                                                                | dall-e-2                                                   |
+| GPT_IMAGE_SIZE      | The generated image size (256x256, 512x512, 1024x1024, 1792x1024 or 1024x1792)                      | 1024x1024                                                  |
 | HISTORY_SIZE        | Number of last messages to keep in history as a context for the next question                       | 3                                                          |
 | CHAT_TEXT_WIDTH     | Maximum number of characters to display per line in interactive chat mode (0 - as much as possible) | 0                                                          |
 | CHAT_COLORED        | Enable this to use colors in interactive chat mode                                                  | true                                                       |
 | CHAT_COLOR_YOU      | The color used for your inputs                                                                      | green                                                      |
 | CHAT_COLOR_AI       | The colore of AI responses                                                                          | white                                                      |
+
+_Image model dall-e-2 requires image size less than or equal to 1024x1024, dall-e-3 requires greater than or equal to
+1024x1024_
 
 _Supported ANSI colors are: black, red, green, yellow, blue, magenta, cyan, and white_
 
