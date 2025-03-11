@@ -20,7 +20,8 @@ setup(name="chatgpt-cli-tool",
           'console_scripts': [
               'chatgpt-cli = cli:main.main',
               'gpt-ai = cli.command:ai.run',
-              'gpt-img = cli.command:img.run'
+              'gpt-img = cli.command:img.run',
+              'gpt-refactor = cli.command:refactor.run'
           ]
       },
       keywords=['chatgpt', 'openai', 'dall-e', 'cli', 'chat'],

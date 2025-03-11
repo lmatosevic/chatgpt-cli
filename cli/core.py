@@ -101,6 +101,37 @@ def read_stdin() -> Union[str, None]:
     return content
 
 
+def extract_prompt_and_file_args(no_content: bool = False) -> Tuple[str, str, bool]:
+    key_in_args = False
+    if len(sys.argv) > 3:
+        file_path = str(sys.argv[3])
+        prompt = str(sys.argv[2])
+        key_in_args = True
+    elif len(sys.argv) > 2:
+        file_path = str(sys.argv[2])
+        prompt = str(sys.argv[1])
+        if valid_api_key(prompt):
+            key_in_args = True
+            prompt = None
+            if no_content:
+                prompt = file_path
+                file_path = None
+    elif len(sys.argv) > 1:
+        file_path = str(sys.argv[1])
+        prompt = None
+        if valid_api_key(file_path):
+            key_in_args = True
+            file_path = None
+            prompt = None
+        elif no_content:
+            prompt = file_path
+            file_path = None
+    else:
+        file_path = None
+        prompt = None
+    return prompt, file_path, key_in_args
+
+
 def chatgpt_response(messages: List[MessageType]) -> Union[str, Iterable[str], None]:
     if messages is None or len(messages) == 0:
         print('No messages provided')

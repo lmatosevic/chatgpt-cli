@@ -90,9 +90,9 @@ the user is prompted with 3 options on how to handle the existing file content:
 2. Keep previous content and start new conversation
 3. Delete previous content and start new conversation
 
-### gpt-ai [api_key] [query]
+### gpt-ai [api_key] [prompt]
 
-This comand sends single chat completion prompt for given query or content, and prints the result on stdout.
+This command sends single chat completion prompt for given query or content, and prints the result on stdout.
 
 ```sh
 # with api key and query argument
@@ -108,7 +108,7 @@ cat file.txt | gpt-ai my_api_key
 cat question.txt | gpt-ai
 
 # with both query as argument and piped input
-cat long-story.txt | gpt-ai "sumarize this text in 5 bullet points"
+cat long-story.txt | gpt-ai "summarize this text in 5 bullet points"
 
 # with both query as argument and input directly from file
 gpt-ai "explain this code" < main.py
@@ -116,9 +116,9 @@ gpt-ai "explain this code" < main.py
 
 ### gpt-img [api_key] [prompt] [img_out]
 
-This comand generates image for given prompt or content, and stores the image in provided output path or if not
-specified, prints the binary result on stdout. Some terminals like PowerShell might malform the binary content when
-outputing to file.
+This command generates image for given prompt or content, and stores the image in provided output path or if not
+specified, prints the binary result on stdout. Some terminals like PowerShell might corrupt the binary content when
+outputting to file.
 
 ```sh
 # with api key, prompt and output image path
@@ -141,6 +141,25 @@ cat description.txt | gpt-img > ./image.png
 
 # with only input directly from file, binary image data will be outputed to stdout
 gpt-img < idea.txt
+```
+
+### gpt-refactor [api_key] [prompt] [file_pattern] 
+
+This command iterate over files specified by glob pattern, and then uses provided prompt to refactor every file and
+writes the response content back to the current file.
+
+```sh
+# with api key, file pattern and prompt to format all python code files
+gpt-refactor my_api_key "format this code" ./src/**/*.py 
+
+# without api key
+gpt-refactor "format this code" ./src/**/*.py
+
+# with both piped input and argument prompts
+cat todo.txt | gpt-refactor "with CRLF endings" ./my_list.txt 
+
+# with only piped input and file pattern
+cat instructions.txt | gpt-refactor ./*.csv
 ```
 
 API key argument is optional for all commands, but if provided it will override API key defined using environment
