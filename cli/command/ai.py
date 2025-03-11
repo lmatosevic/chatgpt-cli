@@ -10,9 +10,21 @@ from cli.core import ensure_api_key, read_stdin, check_args_for_key, valid_input
 
 def run():
     """
-    gpt-ai [api_key] [prompt]
-    """
+    Runs the GPT-AI command line interface.
 
+    This function retrieves input from either standard input or command 
+    line arguments. It validates the input and, if valid, uses the OpenAI 
+    API to generate a response based on the provided prompt or input content.
+
+    Usage example:
+        cat long-story.txt | gpt-ai "summarize this text in 5 bullet points"
+
+    It handles the situation where neither input is provided and exits 
+    the program if an API key is not valid.
+
+    Exits with status code 1 if no input is provided and 2 if the response 
+    from OpenAI API is None.
+    """
     content = read_stdin()
 
     key_in_args, prompt = check_args_for_key()

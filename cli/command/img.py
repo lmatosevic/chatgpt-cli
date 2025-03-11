@@ -11,7 +11,21 @@ from cli.core import ensure_api_key, read_stdin, valid_input, image_url_response
 
 def run():
     """
-    gpt-img [api_key] [prompt] [img_out]
+    Execute the main functionality of the gpt-img application.
+
+    This function reads input from standard input or command line arguments,
+    validates the input, retrieves an image based on the provided prompt, 
+    and writes the image to standard output or a specified file.
+
+    Command-line usage:
+        gpt-img [api_key] [prompt] [img_out]
+
+    If no prompt is provided via the command line or standard input, the
+    function will print an error message and exit with status code 1.
+    If there is an error retrieving the image, it will exit with status code 2.
+
+    Returns:
+        None
     """
 
     content = read_stdin()

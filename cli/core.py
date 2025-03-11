@@ -24,6 +24,21 @@ MessageType = TypedDict('MessageType', {'role': str, 'content': str})
 
 
 def ensure_api_key(default: str = None, prompt: bool = False, use_args_key: bool = True) -> str:
+    """
+    Ensures that the OpenAI API key is configured.
+
+    This function checks the environment for the API key and attempts to retrieve it.
+    If not available, it prompts the user to provide the key, and optionally saves it
+    for future use.
+
+    Args:
+        default (str, optional): A default API key to return if none is found.
+        prompt (bool, optional): Whether to prompt for the key if not found. Defaults to False.
+        use_args_key (bool, optional): Whether to use the API key provided as a command line argument. Defaults to True.
+
+    Returns:
+        str: The OpenAI API key.
+    """
     api_key = get_env('OPENAI_API_KEY', default)
 
     if len(sys.argv) > 1:
@@ -66,6 +81,16 @@ def ensure_api_key(default: str = None, prompt: bool = False, use_args_key: bool
 
 
 def check_args_for_key() -> Tuple[bool, str]:
+    """
+    Checks the command line arguments for an API key.
+
+    This function looks through the command line arguments to determine if an API key
+    is provided. It returns a boolean indicating if a key was found and the key itself.
+
+    Returns:
+        Tuple[bool, str]: A tuple where the first element is a boolean indicating 
+                          if a key is found, and the second element is the key or None.
+    """
     key_in_args = False
     if len(sys.argv) > 2:
         value = str(sys.argv[2])
@@ -81,6 +106,15 @@ def check_args_for_key() -> Tuple[bool, str]:
 
 
 def read_stdin() -> Union[str, None]:
+    """
+    Reads input from standard input (stdin).
+
+    This function attempts to read content from standard input and returns it as a string.
+    If no content is available, it returns None.
+
+    Returns:
+        Union[str, None]: The input content read from stdin or None if no content is available.
+    """
     content = None
     try:
         f = open(0, 'r', encoding='utf-8')
@@ -102,6 +136,19 @@ def read_stdin() -> Union[str, None]:
 
 
 def extract_prompt_and_file_args(no_content: bool = False) -> Tuple[str, str, bool]:
+    """
+    Extracts the prompt and file arguments from the command line.
+
+    This function analyzes the command line arguments to separate the prompt from file path and 
+    checks if an API key is provided in the arguments.
+
+    Args:
+        no_content (bool, optional): Indicates if content should be treated as the prompt. Defaults to False.
+
+    Returns:
+        Tuple[str, str, bool]: A tuple containing the prompt, file path, and a boolean indicating 
+                               if a key was found in the arguments.
+    """
     key_in_args = False
     if len(sys.argv) > 3:
         file_path = str(sys.argv[3])
@@ -133,6 +180,20 @@ def extract_prompt_and_file_args(no_content: bool = False) -> Tuple[str, str, bo
 
 
 def chatgpt_response(messages: List[MessageType]) -> Union[str, Iterable[str], None]:
+    """
+    Sends a chat message to the GPT model and retrieves the response.
+
+    This function takes a list of messages, sends them to the OpenAI ChatCompletion API,
+    and returns the response. It supports both streaming and non-streaming responses.
+
+    Args:
+        messages (List[MessageType]): A list of message dictionaries containing role and content.
+
+    Returns:
+        Union[str, Iterable[str], None]: The response from the API as a string if not streaming, 
+                                           otherwise yields chunks of response in streaming mode, 
+                                           or None in case of errors.
+    """
     if messages is None or len(messages) == 0:
         print('No messages provided')
         return None
@@ -175,6 +236,17 @@ def chatgpt_response(messages: List[MessageType]) -> Union[str, Iterable[str], N
 
 
 def image_url_response(prompt: str) -> Union[str, None]:
+    """
+    Generates an image URL based on the given prompt.
+
+    This function sends the prompt to OpenAI's image generation API and retrieves the URL of the generated image.
+
+    Args:
+        prompt (str): The prompt for which to generate an image.
+
+    Returns:
+        Union[str, None]: The URL of the generated image or None in case of errors.
+    """
     if prompt is None:
         print('Prompt not provided')
         return None
@@ -203,18 +275,64 @@ def image_url_response(prompt: str) -> Union[str, None]:
 
 
 def valid_input(value: Optional[str]) -> bool:
+    """
+    Validates a string input.
+
+    This function checks if the provided value is not None and not just whitespace.
+
+    Args:
+        value (Optional[str]): The string input to validate.
+
+    Returns:
+        bool: True if the input is valid, otherwise False.
+    """
     return value is not None and value.strip() != ''
 
 
 def icase_contains(value: Optional[str], items: List[str]) -> bool:
+    """
+    Checks if a given value, case-insensitively, is contained in a list of items.
+
+    Args:
+        value (Optional[str]): The value to check.
+        items (List[str]): The list of items to search within.
+
+    Returns:
+        bool: True if the value is found in items, otherwise False.
+    """
     return valid_input(value) and value.strip().lower() in items
 
 
 def valid_api_key(value: str) -> bool:
+    """
+    Validates an OpenAI API key.
+
+    This function checks if the API key starts with 'sk-', does not contain whitespace, 
+    and has the appropriate length.
+
+    Args:
+        value (str): The API key to validate.
+
+    Returns:
+        bool: True if the API key is valid, otherwise False.
+    """
     return value.strip().startswith('sk-') and ' ' not in value.strip() and len(value.strip()) >= 48
 
 
 def get_env(key: str, default: Optional[str]) -> str:
+    """
+    Retrieves an environment variable.
+
+    This function gets the value for the specified key from the environment and returns 
+    the default if not set.
+
+    Args:
+        key (str): The environment variable key to retrieve.
+        default (Optional[str]): The default value if the key is not found.
+
+    Returns:
+        str: The value of the environment variable or the default.
+    """
     value = os.getenv(key, default)
     if not valid_input(value):
         value = default

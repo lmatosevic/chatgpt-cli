@@ -19,7 +19,20 @@ from cli.core import ensure_api_key, icase_contains, chatgpt_response, check_arg
 
 def main():
     """
-    chatgpt-cli [api_key] [out_file]
+    Main entry point for the chatgpt-cli application.
+
+    This function initializes the command-line interface for interacting with ChatGPT.
+    It handles command-line arguments, manages chat history, and outputs user and AI responses
+    in a formatted way. Users can enter questions, reset the conversation, or quit the session.
+
+    Command-line arguments:
+    - api_key (optional): API key for authenticating with the OpenAI API.
+    - out_file (optional): If specified, the conversation will be logged to this file.
+
+    Behaviors:
+    - If the output file already exists, users will be prompted to continue, start anew, or delete content.
+    - Conversation history is maintained up to a specified limit set by the 'HISTORY_SIZE' environment variable.
+    - User input can be colored based on the environment configuration.
     """
 
     key_in_args, file_out = check_args_for_key()

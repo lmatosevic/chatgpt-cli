@@ -11,7 +11,22 @@ from cli.core import ensure_api_key, read_stdin, valid_input, chatgpt_response, 
 
 def run():
     """
-    gpt-refactor [api_key] [prompt] [file_pattern]
+    Run the gpt-refactor process to refactor code files.
+
+    Usage:
+        gpt-refactor [api_key] [prompt] [file_pattern]
+    
+    This function reads input from standard input or command arguments,
+    validates the input, and uses OpenAI's API to refactor the code
+    within files matching the given file pattern.
+    The function handles each file, sends its content to the OpenAI API,
+    and writes the refactored code back to the original file.
+
+    If no input is provided, an error message is printed and the program exits.
+    If file_pattern is not valid, it defaults to '*' to match all files.
+
+    Raises:
+        SystemExit: If no valid input is provided or if an error occurs during file processing.
     """
 
     content = read_stdin()
