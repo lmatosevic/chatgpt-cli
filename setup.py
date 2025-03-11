@@ -3,8 +3,8 @@ from setuptools import find_packages
 
 desc = "Command-line interface tool for interacting with ChatGPT using terminal"
 
-verstrline = open('./cli/__init__.py', "rt").readline()
-version = verstrline.split('=')[-1].strip().replace('\'', '')
+version_line = open('./cli/__init__.py', "rt").readline()
+version = version_line.split('=')[-1].strip().replace('\'', '')
 
 setup(name="chatgpt-cli-tool",
       version=version,

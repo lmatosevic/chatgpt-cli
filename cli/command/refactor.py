@@ -43,7 +43,7 @@ def run():
 
     openai.api_key = ensure_api_key(prompt=True, use_args_key=key_in_args)
 
-    default_messages = [{'role': 'system', 'content': 'Return only the file content as a response!'}]
+    default_messages = [{'role': 'system', 'content': 'Return only the full file content as a response!'}]
 
     if valid_input(content):
         default_messages.append({'role': 'user', 'content': str(content)})
