@@ -14,7 +14,7 @@ setup(name="chatgpt-cli-tool",
       url='https://github.com/lmatosevic/chatgpt-cli',
       download_url=f'https://github.com/lmatosevic/chatgpt-cli/archive/refs/tags/{version}.tar.gz',
       packages=find_packages(),
-      install_requires=["openai=0.28.1", "python-dotenv=1.0.0", "colorama=0.4.6", "prompt-toolkit=3.0.39"],
+      install_requires=["openai==0.28.1", "python-dotenv==1.0.0", "colorama==0.4.6", "prompt-toolkit==3.0.39"],
       python_requires='>=3.8.0',
       entry_points={
           'console_scripts': [
