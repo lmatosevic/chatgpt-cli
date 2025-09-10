@@ -115,7 +115,7 @@ cat long-story.txt | gpt-ai "summarize this text in 5 bullet points"
 gpt-ai "explain this code" < main.py
 ```
 
-### gpt-img [api_key] [prompt] [img_out]
+### gpt-img [api_key] [prompt] [img_out] in=[imgs_in]
 
 This command generates image for given prompt or content, and stores the image in provided output path or if not
 specified, prints the binary result on stdout. Some terminals like PowerShell might corrupt the binary content when
@@ -125,10 +125,13 @@ outputting to file.
 # with api key, prompt and output image path
 gpt-img my_api_key "Robot walking a dog" ./my-images/image.png
 
-# without api key
-gpt-img "Robot walking a dog" ./my-images/image.png
+# with api key, prompt, output and input image paths
+gpt-img my_api_key "Robot walking a dog" ./my-images/image.png in=./sample/base.png,./sample/other.png
 
-# without output image path, the binary image data will be outputed to stdout
+# without api key
+gpt-img "Robot walking a dog" ./my-images/image.png in=./sample/base.png
+
+# without output image path, the binary image data will be piped to the stdout
 gpt-img "Robot walking a dog" > image.png
 
 # with both piped input and argument prompts
@@ -140,9 +143,15 @@ cat description.txt | gpt-img ./image.png
 # with only piped input and output image directed to file
 cat description.txt | gpt-img > ./image.png
 
-# with only input directly from file, binary image data will be outputed to stdout
+# with piped prompt, input image, and output image directed to file
+cat description.txt | gpt-img in=./sample/base.png > ./image.png
+
+# with only input directly from file, binary image data will be piped to stdout
 gpt-img < idea.txt
 ```
+
+_Image model dall-e-2 supports only one input image (must be square png file), dall-e-3 does not support input images,
+and gpt-image-1 model supports up to 16 input images._
 
 ### gpt-refactor [api_key] [prompt] [file_pattern]
 

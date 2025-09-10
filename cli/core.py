@@ -137,27 +137,43 @@ def read_stdin() -> Union[str, None]:
     return content
 
 
-def extract_prompt_and_file_args(no_content: bool = False) -> Tuple[str, str, bool]:
+def extract_prompt_and_file_args(no_content: bool = False) -> Tuple[str, str, List[str], bool]:
     """
     Extracts the prompt and file arguments from the command line.
 
-    This function analyzes the command line arguments to separate the prompt from file path and 
+    This function analyzes the command line arguments to separate the prompt from file path, input files, and
     checks if an API key is provided in the arguments.
 
     Args:
         no_content (bool, optional): Indicates if content should be treated as the prompt. Defaults to False.
 
     Returns:
-        Tuple[str, str, bool]: A tuple containing the prompt, file path, and a boolean indicating 
-                               if a key was found in the arguments.
+        Tuple[str, str, List[str], bool]: A tuple containing the prompt, output file path, input files list, and a
+                                          boolean indicating if a key was found in the arguments.
     """
+
+    def get_input_files(arg: str) -> List[str]:
+        return arg.split('=')[1].split(',') if arg.startswith('in=') else []
+
     key_in_args = False
-    if len(sys.argv) > 3:
+    if len(sys.argv) > 4:
+        input_files = get_input_files(str(sys.argv[4]))
         file_path = str(sys.argv[3])
         prompt = str(sys.argv[2])
         key_in_args = True
+    elif len(sys.argv) > 3:
+        input_files = get_input_files(str(sys.argv[3]))
+        file_path = str(sys.argv[3]) if len(input_files) == 0 else str(sys.argv[2])
+        prompt = str(sys.argv[1])
+        if valid_api_key(prompt):
+            key_in_args = True
+            prompt = None
+            if no_content:
+                prompt = file_path
+                file_path = None
     elif len(sys.argv) > 2:
-        file_path = str(sys.argv[2])
+        input_files = get_input_files(str(sys.argv[2]))
+        file_path = str(sys.argv[2]) if len(input_files) == 0 else str(sys.argv[1])
         prompt = str(sys.argv[1])
         if valid_api_key(prompt):
             key_in_args = True
@@ -166,19 +182,21 @@ def extract_prompt_and_file_args(no_content: bool = False) -> Tuple[str, str, bo
                 prompt = file_path
                 file_path = None
     elif len(sys.argv) > 1:
-        file_path = str(sys.argv[1])
+        input_files = get_input_files(str(sys.argv[1]))
+        file_path = str(sys.argv[1]) if len(input_files) == 0 else None
         prompt = None
         if valid_api_key(file_path):
             key_in_args = True
             file_path = None
             prompt = None
-        elif no_content:
+        elif no_content and len(input_files) == 0:
             prompt = file_path
             file_path = None
     else:
+        input_files = []
         file_path = None
         prompt = None
-    return prompt, file_path, key_in_args
+    return prompt, file_path, input_files, key_in_args
 
 
 def chatgpt_response(messages: List[MessageType]) -> Union[str, Iterable[str], None]:
@@ -237,7 +255,7 @@ def chatgpt_response(messages: List[MessageType]) -> Union[str, Iterable[str], N
         sys.exit(5)
 
 
-def image_bytes_response(prompt: str) -> Union[bytes, None]:
+def image_bytes_response(prompt: str, input_images: List[str]) -> Union[bytes, None]:
     """
     Generates an image URL based on the given prompt.
 
@@ -245,6 +263,7 @@ def image_bytes_response(prompt: str) -> Union[bytes, None]:
 
     Args:
         prompt (str): The prompt for which to generate an image.
+        input_images (List[str]): The list of images that should be used for generating a new image.
 
     Returns:
         Union[bytes, None]: The bytes of the generated image or None in case of errors.
@@ -256,13 +275,27 @@ def image_bytes_response(prompt: str) -> Union[bytes, None]:
     image_model = get_env('GPT_IMAGE_MODEL', default_image_model)
     image_size = get_env('GPT_IMAGE_SIZE', default_image_size)
 
+    img_args = {'model': image_model, 'prompt': prompt, 'n': 1, 'size': image_size, 'response_format': 'b64_json'}
+    if image_model.startswith('gpt-image'):
+        del img_args['response_format']
+
+    images = None
+    if len(input_images) > 0:
+        if image_model == 'dall-e-2':
+            # dall-e-2 model only supports one input image
+            images = open(input_images[0], 'rb')
+        elif image_model == 'dall-e-3':
+            # dall-e-3 model does not support any input images
+            images = []
+        else:
+            images = [open(img, 'rb') for img in input_images]
+
     try:
         client = OpenAI()
-        img_args = { 'model': image_model, 'prompt': prompt, 'n': 1, 'size': image_size}
-        if image_model.startswith('gpt-image'):
-            response = client.images.generate(**img_args)
+        if images:
+            response = client.images.edit(**img_args, image=images)
         else:
-            response = client.images.generate(**img_args, response_format='b64_json')
+            response = client.images.generate(**img_args)
         image_base64 = response.data[0].b64_json
         return base64.b64decode(image_base64)
     except APIError as e:
@@ -321,7 +354,8 @@ def valid_api_key(value: str) -> bool:
     Returns:
         bool: True if the API key is valid, otherwise False.
     """
-    return value.strip().startswith('sk-') and ' ' not in value.strip() and len(value.strip()) >= 48
+    return (value is not None and value.strip().startswith('sk-') and ' ' not in value.strip()
+            and len(value.strip()) >= 48)
 
 
 def get_env(key: str, default: Optional[str]) -> str:
