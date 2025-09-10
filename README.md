@@ -41,20 +41,21 @@ Then you can configure the tool with your API key using any of the following opt
 
 All configurable environment variables for ChatGPT can be found in [.env.example](.env.example) file:
 
-| Variable name       | Description                                                                                         | Default value                                              |
-|---------------------|-----------------------------------------------------------------------------------------------------|------------------------------------------------------------|
-| OPENAI_API_KEY      | OpenAI API key used to send request                                                                 | -                                                          |
-| GPT_MODEL           | GPT model used for chat completion                                                                  | gpt-3.5-turbo                                              |
-| GPT_TEMPERATURE     | GPT temperature value (between 0 and 2), lower values provide more focused and deterministic output | 1                                                          |
-| GPT_STREAM_RESPONSE | Enable OpenAI client to use Server Sent Events for streaming tokens from the API                    | true                                                       |
-| GPT_SYSTEM_DESC     | The description for the system on how to best tailor answers (disable with "None")                  | You are a very direct and straight-to-the-point assistant. |
-| GPT_IMAGE_MODEL     | GPT model used for generating images                                                                | dall-e-2                                                   |
-| GPT_IMAGE_SIZE      | The generated image size (256x256, 512x512, 1024x1024, 1792x1024 or 1024x1792)                      | 1024x1024                                                  |
-| HISTORY_SIZE        | Number of last messages to keep in history as a context for the next question                       | 3                                                          |
-| CHAT_TEXT_WIDTH     | Maximum number of characters to display per line in interactive chat mode (0 - as much as possible) | 0                                                          |
-| CHAT_COLORED        | Enable this to use colors in interactive chat mode                                                  | true                                                       |
-| CHAT_COLOR_YOU      | The color used for your inputs                                                                      | green                                                      |
-| CHAT_COLOR_AI       | The colore of AI responses                                                                          | white                                                      |
+| Variable name        | Description                                                                                         | Default value                                              |
+|----------------------|-----------------------------------------------------------------------------------------------------|------------------------------------------------------------|
+| OPENAI_API_KEY       | OpenAI API key used to send request                                                                 | -                                                          |
+| GPT_MODEL            | GPT model used for chat responses                                                                   | gpt-4o-mini                                                |
+| GPT_REASONING_EFFORT | GPT reasoning effort (minimal, low, medium or high). Used for gpt-5 and o-series models only        | low                                                        |
+| GPT_TEMPERATURE      | GPT temperature value (between 0 and 2), lower values provide more focused and deterministic output | 1                                                          |
+| GPT_STREAM_RESPONSE  | Enable OpenAI client to use Server Sent Events for streaming tokens from the API                    | true                                                       |
+| GPT_SYSTEM_DESC      | The description for the system on how to best tailor answers (disable with "None")                  | You are a very direct and straight-to-the-point assistant. |
+| GPT_IMAGE_MODEL      | GPT model used for generating images                                                                | gpt-image-1                                                |
+| GPT_IMAGE_SIZE       | The generated image size (256x256, 512x512, 1024x1024, 1792x1024 or 1024x1792)                      | 1024x1024                                                  |
+| HISTORY_SIZE         | Number of last messages to keep in history as a context for the next question                       | 3                                                          |
+| CHAT_TEXT_WIDTH      | Maximum number of characters to display per line in interactive chat mode (0 - as much as possible) | 0                                                          |
+| CHAT_COLORED         | Enable this to use colors in interactive chat mode                                                  | true                                                       |
+| CHAT_COLOR_YOU       | The color used for your inputs                                                                      | green                                                      |
+| CHAT_COLOR_AI        | The colore of AI responses                                                                          | white                                                      |
 
 _Image model dall-e-2 requires image size less than or equal to 1024x1024, dall-e-3 requires greater than or equal to
 1024x1024_
@@ -114,7 +115,7 @@ cat long-story.txt | gpt-ai "summarize this text in 5 bullet points"
 gpt-ai "explain this code" < main.py
 ```
 
-### gpt-img [api_key] [prompt] [img_out]
+### gpt-img [api_key] [prompt] [img_out] in=[imgs_in]
 
 This command generates image for given prompt or content, and stores the image in provided output path or if not
 specified, prints the binary result on stdout. Some terminals like PowerShell might corrupt the binary content when
@@ -124,10 +125,13 @@ outputting to file.
 # with api key, prompt and output image path
 gpt-img my_api_key "Robot walking a dog" ./my-images/image.png
 
-# without api key
-gpt-img "Robot walking a dog" ./my-images/image.png
+# with api key, prompt, output and input image paths
+gpt-img my_api_key "Robot walking a dog" ./my-images/image.png in=./sample/base.png,./sample/other.png
 
-# without output image path, the binary image data will be outputed to stdout
+# without api key
+gpt-img "Robot walking a dog" ./my-images/image.png in=./sample/base.png
+
+# without output image path, the binary image data will be piped to the stdout
 gpt-img "Robot walking a dog" > image.png
 
 # with both piped input and argument prompts
@@ -139,11 +143,17 @@ cat description.txt | gpt-img ./image.png
 # with only piped input and output image directed to file
 cat description.txt | gpt-img > ./image.png
 
-# with only input directly from file, binary image data will be outputed to stdout
+# with piped prompt, input image, and output image directed to file
+cat description.txt | gpt-img in=./sample/base.png > ./image.png
+
+# with only input directly from file, binary image data will be piped to stdout
 gpt-img < idea.txt
 ```
 
-### gpt-refactor [api_key] [prompt] [file_pattern] 
+_Image model dall-e-2 supports only one input image (must be square png file), dall-e-3 does not support input images,
+and gpt-image-1 model supports up to 16 input images._
+
+### gpt-refactor [api_key] [prompt] [file_pattern]
 
 This command iterate over files specified by glob pattern, and then uses provided prompt to refactor every file and
 writes the response content back to the current file.

@@ -1,9 +1,10 @@
+import base64
 import os
 import sys
-from typing import List, TypedDict, Union, Optional, Tuple, Iterable
+from typing import List, TypedDict, Union, Optional, Tuple, Iterable, Literal
 
-import openai
 from dotenv import load_dotenv
+from openai import OpenAI, APIError, AuthenticationError, BadRequestError, RateLimitError
 
 from cli import __version__
 
@@ -13,11 +14,12 @@ env_file = os.getcwd() + '/.env'
 load_dotenv(home_env_file)
 load_dotenv(env_file)
 
-default_model = 'gpt-3.5-turbo'
+default_model = 'gpt-5-mini'
+default_reasoning_effort = 'low'
 default_temperature = '1'
 default_stream_response = 'true'
 default_system_desc = 'You are a very direct and straight-to-the-point assistant.'
-default_image_model = 'dall-e-2'
+default_image_model = 'gpt-image-1'
 default_image_size = '1024x1024'
 
 MessageType = TypedDict('MessageType', {'role': str, 'content': str})
@@ -135,27 +137,43 @@ def read_stdin() -> Union[str, None]:
     return content
 
 
-def extract_prompt_and_file_args(no_content: bool = False) -> Tuple[str, str, bool]:
+def extract_prompt_and_file_args(no_content: bool = False) -> Tuple[str, str, List[str], bool]:
     """
     Extracts the prompt and file arguments from the command line.
 
-    This function analyzes the command line arguments to separate the prompt from file path and 
+    This function analyzes the command line arguments to separate the prompt from file path, input files, and
     checks if an API key is provided in the arguments.
 
     Args:
         no_content (bool, optional): Indicates if content should be treated as the prompt. Defaults to False.
 
     Returns:
-        Tuple[str, str, bool]: A tuple containing the prompt, file path, and a boolean indicating 
-                               if a key was found in the arguments.
+        Tuple[str, str, List[str], bool]: A tuple containing the prompt, output file path, input files list, and a
+                                          boolean indicating if a key was found in the arguments.
     """
+
+    def get_input_files(arg: str) -> List[str]:
+        return arg.split('=')[1].split(',') if arg.startswith('in=') else []
+
     key_in_args = False
-    if len(sys.argv) > 3:
+    if len(sys.argv) > 4:
+        input_files = get_input_files(str(sys.argv[4]))
         file_path = str(sys.argv[3])
         prompt = str(sys.argv[2])
         key_in_args = True
+    elif len(sys.argv) > 3:
+        input_files = get_input_files(str(sys.argv[3]))
+        file_path = str(sys.argv[3]) if len(input_files) == 0 else str(sys.argv[2])
+        prompt = str(sys.argv[1])
+        if valid_api_key(prompt):
+            key_in_args = True
+            prompt = None
+            if no_content:
+                prompt = file_path
+                file_path = None
     elif len(sys.argv) > 2:
-        file_path = str(sys.argv[2])
+        input_files = get_input_files(str(sys.argv[2]))
+        file_path = str(sys.argv[2]) if len(input_files) == 0 else str(sys.argv[1])
         prompt = str(sys.argv[1])
         if valid_api_key(prompt):
             key_in_args = True
@@ -164,19 +182,21 @@ def extract_prompt_and_file_args(no_content: bool = False) -> Tuple[str, str, bo
                 prompt = file_path
                 file_path = None
     elif len(sys.argv) > 1:
-        file_path = str(sys.argv[1])
+        input_files = get_input_files(str(sys.argv[1]))
+        file_path = str(sys.argv[1]) if len(input_files) == 0 else None
         prompt = None
         if valid_api_key(file_path):
             key_in_args = True
             file_path = None
             prompt = None
-        elif no_content:
+        elif no_content and len(input_files) == 0:
             prompt = file_path
             file_path = None
     else:
+        input_files = []
         file_path = None
         prompt = None
-    return prompt, file_path, key_in_args
+    return prompt, file_path, input_files, key_in_args
 
 
 def chatgpt_response(messages: List[MessageType]) -> Union[str, Iterable[str], None]:
@@ -199,53 +219,54 @@ def chatgpt_response(messages: List[MessageType]) -> Union[str, Iterable[str], N
         return None
 
     model = get_env('GPT_MODEL', default_model)
+    reasoning_effort = get_env('GPT_REASONING_EFFORT', default_reasoning_effort)
     temperature = float(get_env('GPT_TEMPERATURE', default_temperature))
     stream = icase_contains(get_env('GPT_STREAM_RESPONSE', default_stream_response), ['true', 'yes', 'on'])
     system_desc = get_env('GPT_SYSTEM_DESC', default_system_desc)
 
-    if system_desc.lower() != 'none':
-        messages.insert(0, {'role': 'system', 'content': system_desc})
+    reasoning = {'effort': reasoning_effort}
+    if not model.startswith('gpt-5'):
+        reasoning = None
 
     try:
-        response = openai.ChatCompletion.create(model=model, temperature=temperature, messages=messages, stream=stream)
+        client = OpenAI()
+        response = client.responses.create(model=model, reasoning=reasoning, temperature=temperature, input=messages,
+                                           instructions=system_desc, stream=stream)
         if not stream:
-            return response.choices[0].message.content.strip('\n')
+            return response.output[0].content[0].text.strip('\n')
 
         def stream_response() -> Iterable[str]:
-            for line in response:
-                chunk = line['choices'][0].get('delta', {}).get('content', '')
-                if chunk:
-                    yield chunk
+            for event in response:
+                if event.type == 'response.output_text.delta':
+                    yield event.delta
 
         return stream_response()
-    except openai.error.APIError as e:
+    except APIError as e:
         print(f'OpenAI API returned an API Error: {e}')
         return None
-    except openai.error.APIConnectionError as e:
-        print(f'Failed to connect to OpenAI API: {e}')
-        return None
-    except openai.error.AuthenticationError as e:
+    except AuthenticationError as e:
         print(f'Invalid ApiKey: {e}')
         sys.exit(4)
-    except openai.error.RateLimitError as e:
+    except RateLimitError as e:
         print(f'OpenAI API request exceeded rate limit: {e}')
         return None
-    except openai.error.InvalidRequestError as e:
+    except BadRequestError as e:
         print(f'Invalid request: {e}')
         sys.exit(5)
 
 
-def image_url_response(prompt: str) -> Union[str, None]:
+def image_bytes_response(prompt: str, input_images: List[str]) -> Union[bytes, None]:
     """
     Generates an image URL based on the given prompt.
 
-    This function sends the prompt to OpenAI's image generation API and retrieves the URL of the generated image.
+    This function sends the prompt to OpenAI's image generation API and retrieves the bytes of the generated image.
 
     Args:
         prompt (str): The prompt for which to generate an image.
+        input_images (List[str]): The list of images that should be used for generating a new image.
 
     Returns:
-        Union[str, None]: The URL of the generated image or None in case of errors.
+        Union[bytes, None]: The bytes of the generated image or None in case of errors.
     """
     if prompt is None:
         print('Prompt not provided')
@@ -254,22 +275,39 @@ def image_url_response(prompt: str) -> Union[str, None]:
     image_model = get_env('GPT_IMAGE_MODEL', default_image_model)
     image_size = get_env('GPT_IMAGE_SIZE', default_image_size)
 
+    img_args = {'model': image_model, 'prompt': prompt, 'n': 1, 'size': image_size, 'response_format': 'b64_json'}
+    if image_model.startswith('gpt-image'):
+        del img_args['response_format']
+
+    images = None
+    if len(input_images) > 0:
+        if image_model == 'dall-e-2':
+            # dall-e-2 model only supports one input image
+            images = open(input_images[0], 'rb')
+        elif image_model == 'dall-e-3':
+            # dall-e-3 model does not support any input images
+            images = []
+        else:
+            images = [open(img, 'rb') for img in input_images]
+
     try:
-        response = openai.Image.create(model=image_model, prompt=prompt, n=1, size=image_size)
-        return response.data[0].url
-    except openai.error.APIError as e:
+        client = OpenAI()
+        if images:
+            response = client.images.edit(**img_args, image=images)
+        else:
+            response = client.images.generate(**img_args)
+        image_base64 = response.data[0].b64_json
+        return base64.b64decode(image_base64)
+    except APIError as e:
         print(f'OpenAI API returned an API Error: {e}')
         return None
-    except openai.error.APIConnectionError as e:
-        print(f'Failed to connect to OpenAI API: {e}')
-        return None
-    except openai.error.AuthenticationError as e:
+    except AuthenticationError as e:
         print(f'Invalid ApiKey: {e}')
         sys.exit(4)
-    except openai.error.RateLimitError as e:
+    except RateLimitError as e:
         print(f'OpenAI API request exceeded rate limit: {e}')
         return None
-    except openai.error.InvalidRequestError as e:
+    except BadRequestError as e:
         print(f'Invalid request: {e}')
         sys.exit(5)
 
@@ -316,7 +354,8 @@ def valid_api_key(value: str) -> bool:
     Returns:
         bool: True if the API key is valid, otherwise False.
     """
-    return value.strip().startswith('sk-') and ' ' not in value.strip() and len(value.strip()) >= 48
+    return (value is not None and value.strip().startswith('sk-') and ' ' not in value.strip()
+            and len(value.strip()) >= 48)
 
 
 def get_env(key: str, default: Optional[str]) -> str:
