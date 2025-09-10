@@ -1,9 +1,10 @@
+import base64
 import os
 import sys
-from typing import List, TypedDict, Union, Optional, Tuple, Iterable
+from typing import List, TypedDict, Union, Optional, Tuple, Iterable, Literal
 
-import openai
 from dotenv import load_dotenv
+from openai import OpenAI, APIError, AuthenticationError, BadRequestError, RateLimitError
 
 from cli import __version__
 
@@ -13,11 +14,12 @@ env_file = os.getcwd() + '/.env'
 load_dotenv(home_env_file)
 load_dotenv(env_file)
 
-default_model = 'gpt-3.5-turbo'
+default_model = 'gpt-5-mini'
+default_reasoning_effort = 'low'
 default_temperature = '1'
 default_stream_response = 'true'
 default_system_desc = 'You are a very direct and straight-to-the-point assistant.'
-default_image_model = 'dall-e-2'
+default_image_model = 'gpt-image-1'
 default_image_size = '1024x1024'
 
 MessageType = TypedDict('MessageType', {'role': str, 'content': str})
@@ -199,53 +201,53 @@ def chatgpt_response(messages: List[MessageType]) -> Union[str, Iterable[str], N
         return None
 
     model = get_env('GPT_MODEL', default_model)
+    reasoning_effort = get_env('GPT_REASONING_EFFORT', default_reasoning_effort)
     temperature = float(get_env('GPT_TEMPERATURE', default_temperature))
     stream = icase_contains(get_env('GPT_STREAM_RESPONSE', default_stream_response), ['true', 'yes', 'on'])
     system_desc = get_env('GPT_SYSTEM_DESC', default_system_desc)
 
-    if system_desc.lower() != 'none':
-        messages.insert(0, {'role': 'system', 'content': system_desc})
+    reasoning = {'effort': reasoning_effort}
+    if not model.startswith('gpt-5'):
+        reasoning = None
 
     try:
-        response = openai.ChatCompletion.create(model=model, temperature=temperature, messages=messages, stream=stream)
+        client = OpenAI()
+        response = client.responses.create(model=model, reasoning=reasoning, temperature=temperature, input=messages,
+                                           instructions=system_desc, stream=stream)
         if not stream:
-            return response.choices[0].message.content.strip('\n')
+            return response.output[0].content[0].text.strip('\n')
 
         def stream_response() -> Iterable[str]:
-            for line in response:
-                chunk = line['choices'][0].get('delta', {}).get('content', '')
-                if chunk:
-                    yield chunk
+            for event in response:
+                if event.type == 'response.output_text.delta':
+                    yield event.delta
 
         return stream_response()
-    except openai.error.APIError as e:
+    except APIError as e:
         print(f'OpenAI API returned an API Error: {e}')
         return None
-    except openai.error.APIConnectionError as e:
-        print(f'Failed to connect to OpenAI API: {e}')
-        return None
-    except openai.error.AuthenticationError as e:
+    except AuthenticationError as e:
         print(f'Invalid ApiKey: {e}')
         sys.exit(4)
-    except openai.error.RateLimitError as e:
+    except RateLimitError as e:
         print(f'OpenAI API request exceeded rate limit: {e}')
         return None
-    except openai.error.InvalidRequestError as e:
+    except BadRequestError as e:
         print(f'Invalid request: {e}')
         sys.exit(5)
 
 
-def image_url_response(prompt: str) -> Union[str, None]:
+def image_bytes_response(prompt: str) -> Union[bytes, None]:
     """
     Generates an image URL based on the given prompt.
 
-    This function sends the prompt to OpenAI's image generation API and retrieves the URL of the generated image.
+    This function sends the prompt to OpenAI's image generation API and retrieves the bytes of the generated image.
 
     Args:
         prompt (str): The prompt for which to generate an image.
 
     Returns:
-        Union[str, None]: The URL of the generated image or None in case of errors.
+        Union[bytes, None]: The bytes of the generated image or None in case of errors.
     """
     if prompt is None:
         print('Prompt not provided')
@@ -255,21 +257,24 @@ def image_url_response(prompt: str) -> Union[str, None]:
     image_size = get_env('GPT_IMAGE_SIZE', default_image_size)
 
     try:
-        response = openai.Image.create(model=image_model, prompt=prompt, n=1, size=image_size)
-        return response.data[0].url
-    except openai.error.APIError as e:
+        client = OpenAI()
+        img_args = { 'model': image_model, 'prompt': prompt, 'n': 1, 'size': image_size}
+        if image_model.startswith('gpt-image'):
+            response = client.images.generate(**img_args)
+        else:
+            response = client.images.generate(**img_args, response_format='b64_json')
+        image_base64 = response.data[0].b64_json
+        return base64.b64decode(image_base64)
+    except APIError as e:
         print(f'OpenAI API returned an API Error: {e}')
         return None
-    except openai.error.APIConnectionError as e:
-        print(f'Failed to connect to OpenAI API: {e}')
-        return None
-    except openai.error.AuthenticationError as e:
+    except AuthenticationError as e:
         print(f'Invalid ApiKey: {e}')
         sys.exit(4)
-    except openai.error.RateLimitError as e:
+    except RateLimitError as e:
         print(f'OpenAI API request exceeded rate limit: {e}')
         return None
-    except openai.error.InvalidRequestError as e:
+    except BadRequestError as e:
         print(f'Invalid request: {e}')
         sys.exit(5)
 

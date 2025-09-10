@@ -1,12 +1,11 @@
 import os
 import sys
-from urllib.request import urlopen
 
 import openai
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-from cli.core import ensure_api_key, read_stdin, valid_input, image_url_response, extract_prompt_and_file_args
+from cli.core import ensure_api_key, read_stdin, valid_input, image_bytes_response, extract_prompt_and_file_args
 
 
 def run():
@@ -47,17 +46,18 @@ def run():
             combined_prompt = combined_prompt + '. '
         combined_prompt = combined_prompt + prompt
 
-    response = image_url_response(combined_prompt)
-    if response is None:
+    img = image_bytes_response(combined_prompt)
+    if img is None:
         sys.exit(2)
-
-    img = urlopen(response).read()
 
     if img_out is None:
         stdout = os.fdopen(sys.stdout.fileno(), "wb", closefd=False)
         stdout.write(img)
         stdout.flush()
     else:
+        img_dir = os.path.dirname(img_out)
+        if img_dir != '' and not os.path.exists(img_dir):
+            os.makedirs(img_dir, exist_ok=True)
         image_file = open(img_out, 'wb')
         image_file.write(img)
         image_file.close()
