@@ -44,7 +44,7 @@ All configurable environment variables for ChatGPT can be found in [.env.example
 | Variable name        | Description                                                                                         | Default value                                              |
 |----------------------|-----------------------------------------------------------------------------------------------------|------------------------------------------------------------|
 | OPENAI_API_KEY       | OpenAI API key used to send request                                                                 | -                                                          |
-| GPT_MODEL            | GPT model used for chat responses                                                                   | gpt-4o-mini                                                |
+| GPT_MODEL            | GPT model used for chat responses                                                                   | gpt-5-mini                                                 |
 | GPT_REASONING_EFFORT | GPT reasoning effort (minimal, low, medium or high). Used for gpt-5 and o-series models only        | low                                                        |
 | GPT_TEMPERATURE      | GPT temperature value (between 0 and 2), lower values provide more focused and deterministic output | 1                                                          |
 | GPT_STREAM_RESPONSE  | Enable OpenAI client to use Server Sent Events for streaming tokens from the API                    | true                                                       |
