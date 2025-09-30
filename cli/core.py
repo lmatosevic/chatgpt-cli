@@ -1,7 +1,7 @@
 import base64
 import os
 import sys
-from typing import List, TypedDict, Union, Optional, Tuple, Iterable, Literal
+from typing import List, TypedDict, Union, Optional, Tuple, Iterable
 
 from dotenv import load_dotenv
 from openai import OpenAI, APIError, AuthenticationError, BadRequestError, RateLimitError
@@ -61,7 +61,7 @@ def ensure_api_key(default: str = None, prompt: bool = False, use_args_key: bool
             '3. Set it through environment variable OPENAI_API_KEY\n'
             '4. Pass it as the first argument when executing this script (e.g. chatgpt-cli your_api_key [out_file])\n')
 
-        if prompt is False:
+        if not prompt:
             sys.exit(1)
 
         api_key = input('Or, you can enter the API key now: ')

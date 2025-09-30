@@ -49,7 +49,6 @@ def main():
 
     if colored:
         colorama_init(autoreset=True)
-
         color_you_ansi = getattr(Fore, color_you) if color_you in Fore.__dict__.keys() and color_you != 'WHITE' else ''
         color_ai_ansi = getattr(Fore, color_ai) if color_ai in Fore.__dict__.keys() and color_ai != 'WHITE' else ''
         color_end = Style.RESET_ALL
@@ -126,9 +125,8 @@ def main():
                     if icase_contains(line_text.replace('\n', ''), ['/reset', '/r']):
                         file_messages.clear()
 
-    end = False
     chat_history = [*file_messages[-2 * (history_size + 1):]]
-    while end is False:
+    while True:
         stream_content = ''
         stream_in_progress = False
         try:
