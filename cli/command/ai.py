@@ -34,7 +34,7 @@ def run():
               'Usage example: cat long-story.txt | gpt-ai "sumarize this text in 5 bullet points"')
         sys.exit(1)
 
-    openai.api_key = ensure_api_key(prompt=True, use_args_key=key_in_args)
+    ensure_api_key(prompt=True, use_args_key=key_in_args)
 
     messages = []
 

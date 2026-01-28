@@ -25,7 +25,7 @@ default_image_size = '1024x1024'
 MessageType = TypedDict('MessageType', {'role': str, 'content': str})
 
 
-def ensure_api_key(default: str = None, prompt: bool = False, use_args_key: bool = True) -> str:
+def ensure_api_key(default: str = None, prompt: bool = False, use_args_key: bool = True):
     """
     Ensures that the OpenAI API key is configured.
 
@@ -78,6 +78,8 @@ def ensure_api_key(default: str = None, prompt: bool = False, use_args_key: bool
                 f = open(home_env_file, "w")
                 f.write(f'OPENAI_API_KEY={api_key}')
                 print(f'API key saved in {home_env_file}\n')
+
+    os.environ['OPENAI_API_KEY'] = api_key
 
     return api_key if valid_input(api_key) else default
 

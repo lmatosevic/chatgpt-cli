@@ -35,7 +35,7 @@ def run():
               'Usage example: cat description.txt | gpt-img "with cartoon graphics" out.png in=sample.png')
         sys.exit(1)
 
-    openai.api_key = ensure_api_key(prompt=True, use_args_key=key_in_args)
+    ensure_api_key(prompt=True, use_args_key=key_in_args)
 
     combined_prompt = ''
     if valid_input(content):

@@ -41,7 +41,7 @@ def run():
     if not valid_input(file_pattern):
         file_pattern = '*'
 
-    openai.api_key = ensure_api_key(prompt=True, use_args_key=key_in_args)
+    ensure_api_key(prompt=True, use_args_key=key_in_args)
 
     default_messages = [{'role': 'system', 'content': 'Return only the full file content as a response!'}]
 

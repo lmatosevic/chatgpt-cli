@@ -37,7 +37,7 @@ def main():
 
     key_in_args, file_out = check_args_for_key()
 
-    openai.api_key = ensure_api_key(prompt=True, use_args_key=key_in_args)
+    ensure_api_key(prompt=True, use_args_key=key_in_args)
 
     history_size = int(get_env('HISTORY_SIZE', '3'))
 
@@ -209,7 +209,7 @@ def main():
                 print('\n')
             else:
                 break
-    print(f'\n{color_ai_ansi}AI: Goodbye', end=color_end)
+    print(f'\n{color_ai_ansi}AI: Goodbye\n', end=color_end)
     if file:
         file.write(f'\nAI: Goodbye\n')
         file.close()
