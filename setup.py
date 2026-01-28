@@ -18,7 +18,7 @@ setup(name="chatgpt-cli-tool",
       download_url=f'https://github.com/lmatosevic/chatgpt-cli/archive/refs/tags/{version}.tar.gz',
       packages=find_packages(),
       install_requires=requirements,
-      python_requires='>=3.8.0',
+      python_requires='>=3.11.0',
       entry_points={
           'console_scripts': [
               'chatgpt-cli = cli:main.main',

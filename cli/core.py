@@ -14,7 +14,7 @@ env_file = os.getcwd() + '/.env'
 load_dotenv(home_env_file)
 load_dotenv(env_file)
 
-default_model = 'gpt-5-mini'
+default_model = 'gpt-5.1'
 default_reasoning_effort = 'low'
 default_temperature = '1'
 default_stream_response = 'true'
