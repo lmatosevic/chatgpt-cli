@@ -4,7 +4,6 @@ import time
 import re
 from datetime import datetime
 
-import openai
 from colorama import Fore
 from colorama import Style
 from colorama import init as colorama_init
